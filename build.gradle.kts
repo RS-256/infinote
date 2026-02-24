@@ -37,6 +37,8 @@ dependencies {
         for (it in modules) modImplementation(fabricApi.module(it, property("deps.fabric_api") as String))
     }
 
+
+
     minecraft("com.mojang:minecraft:${sc.current.version}")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
@@ -47,7 +49,7 @@ dependencies {
 
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
-    accessWidenerPath = rootProject.file("src/main/resources/template.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/infinote.accesswidener")
 
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
@@ -57,6 +59,10 @@ loom {
         ideConfigGenerated(true)
         vmArgs("-Dmixin.debug.export=true") // Exports transformed classes for debugging
         runDir = "../../run" // Shares the run directory between versions
+    }
+
+    mixin {
+        useLegacyMixinAp = true
     }
 }
 
@@ -83,7 +89,16 @@ tasks {
         filesMatching("fabric.mod.json") { expand(props) }
 
         val mixinJava = "JAVA_${requiredJava.majorVersion}"
-        filesMatching("*.mixins.json") { expand("java" to mixinJava) }
+        val refmapName = "infinote-refmap.json"
+
+        filesMatching("*.mixins.json") {
+            expand(
+                mapOf(
+                    "java" to mixinJava,
+                    "refmap" to refmapName
+                )
+            )
+        }
     }
 
     // Builds the version into a shared folder in `build/libs/${mod version}/`

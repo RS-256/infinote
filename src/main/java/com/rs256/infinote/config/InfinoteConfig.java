@@ -1,6 +1,5 @@
 package com.rs256.infinote.config;
 
-import com.ibm.icu.impl.UResource;
 import com.rs256.infinote.Infinote;
 
 import com.google.common.reflect.TypeToken;

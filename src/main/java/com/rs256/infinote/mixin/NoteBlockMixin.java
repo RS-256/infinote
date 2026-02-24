@@ -23,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.rs256.infinote.Infinote.LOGGER;
 import static com.rs256.infinote.Infinote.PLAY_CUSTOM_SOUND;
 
 @Mixin(NoteBlock.class)
@@ -45,8 +44,6 @@ public class NoteBlockMixin {
                 float shiftedNote = note + config.pitch_shift;
                 float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
                 world.playSound(null, pos, soundEvent, config.category, config.volume, pitch);
-
-                LOGGER.info("contains!");
             } else {
                 float shiftedNote = note + config.pitch_shift;
                 float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
