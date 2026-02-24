@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.rs256.infinote.client.mixin",
+  "compatibilityLevel": "${java}",
+  "mixins": [
+    "SoundEngineMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

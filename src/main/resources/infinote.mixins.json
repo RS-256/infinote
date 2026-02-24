@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.rs256.infinote.mixin",
+	"compatibilityLevel": "${java}",
+	"mixins": [
+		"NoteBlockMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

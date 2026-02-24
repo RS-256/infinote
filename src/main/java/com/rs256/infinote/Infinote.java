@@ -1,0 +1,46 @@
+package com.rs256.infinote;
+
+import com.rs256.infinote.commands.InfinoteCommand;
+import com.rs256.infinote.config.InfinoteConfig;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.resources.ResourceLocation;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Infinote implements ModInitializer {
+	public static final String MOD_ID = "infinote";
+	public static final String VERSION = /*$ mod_version*/ "0.1.0";
+	public static final String MINECRAFT = /*$ minecraft*/ "1.20.1";
+
+	// This logger is used to write text to the console and the log file.
+	// It is considered best practice to use your mod id as the logger's name.
+	// That way, it's clear which mod wrote info, warnings, and errors.
+	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final ResourceLocation PLAY_CUSTOM_SOUND = id(MOD_ID, "play_custom_sound");
+
+
+	@Override
+	public void onInitialize() {
+		// This code runs as soon as Minecraft is in a mod-load-ready state.
+		// However, some things (like resources) may still be uninitialized.
+		// Proceed with mild caution.
+
+		LOGGER.info("He said the sky is the limit!");
+		InfinoteConfig.load();
+		registerCommands();
+	}
+
+	public static ResourceLocation id(String namespace, String path) {
+		//? if <1.21 {
+		return new ResourceLocation(namespace, path);
+		//?} else
+		//return ResourceLocation.fromNamespaceAndPath(namespace, path);
+	}
+
+	public void registerCommands() {
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> InfinoteCommand.register(dispatcher, registryAccess));
+	}
+}
