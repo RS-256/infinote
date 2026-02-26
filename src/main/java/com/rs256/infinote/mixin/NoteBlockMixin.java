@@ -1,16 +1,13 @@
 package com.rs256.infinote.mixin;
 
-import com.rs256.infinote.Infinote;
-import com.rs256.infinote.config.BlockSoundConfig;
+import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.compat.RegistryCompat;
+import com.rs256.infinote.config.BlockSoundConfigCompiled;
 import com.rs256.infinote.config.InfinoteConfig;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import com.rs256.infinote.compat.NetworkCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -23,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.rs256.infinote.Infinote.PLAY_CUSTOM_SOUND;
+import static com.rs256.infinote.Infinote.LOGGER;
 
 @Mixin(NoteBlock.class)
 public class NoteBlockMixin {
@@ -33,31 +30,32 @@ public class NoteBlockMixin {
         int note = state.getValue(NoteBlock.NOTE);
 
         BlockPos belowPos = pos.below(1);
-        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(world.getBlockState(belowPos).getBlock());
-        BlockSoundConfig config = InfinoteConfig.BLOCK_SOUNDS.get(blockId.toString());
 
-        if (config != null) {
-            ResourceLocation soundId = new ResourceLocation(config.sound);
+        String belowBlock = RegistryCompat.blockIdString(world.getBlockState(belowPos).getBlock()); // これも後でcompat化
+        BlockSoundConfigCompiled c = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(belowBlock);
 
-            if (BuiltInRegistries.SOUND_EVENT.containsKey(soundId)) {
-                SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(soundId);
-                float shiftedNote = note + config.pitch_shift;
+        if (c != null) {
+            var soundId = IdCompat.idFromString(c.sound);
+
+            if (soundId == null) {
+                LOGGER.warn("cant cast!: {}, ignored", c.sound);
+                return;
+            }
+
+            if (RegistryCompat.isSoundEventRegistered(c.sound)) {
+                SoundEvent soundEvent = RegistryCompat.getRegisteredSoundEvent(c.sound);
+                float shiftedNote = note + c.pitchShift;
                 float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
-                world.playSound(null, pos, soundEvent, config.category, config.volume, pitch);
+
+                world.playSound(null, pos, soundEvent, c.category, c.volume, pitch);
             } else {
-                float shiftedNote = note + config.pitch_shift;
+                float shiftedNote = note + c.pitchShift;
                 float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
                 ServerLevel serverWorld = (ServerLevel) world;
-                FriendlyByteBuf buf = PacketByteBufs.create();
-                buf.writeResourceLocation(soundId);
-                buf.writeEnum(config.category);
-                buf.writeFloat(config.volume);
-                buf.writeFloat(pitch);
-                buf.writeBlockPos(pos);
 
                 for (ServerPlayer p : serverWorld.players()) {
-                    if (p.blockPosition().closerThan(pos, config.volume * 16)) { // 適当に範囲
-                        ServerPlayNetworking.send(p, PLAY_CUSTOM_SOUND, buf);
+                    if (p.blockPosition().closerThan(pos, c.volume * 16)) {
+                        NetworkCompat.sendPlayCustomSound(p, c.sound, c.category, pitch, c.volume, pos);
                     }
                 }
             }

@@ -6,8 +6,8 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import com.rs256.infinote.compat.IdCompat;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 
 import java.io.IOException;
@@ -20,6 +20,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.minecraft.sounds.SoundSource.RECORDS;
+
 public class InfinoteConfig {
 
     private static final Gson GSON = new GsonBuilder()
@@ -27,6 +29,7 @@ public class InfinoteConfig {
             .create();
 
     public static Map<String, BlockSoundConfig> BLOCK_SOUNDS = new HashMap<>();
+    public static final Map<String, BlockSoundConfigCompiled> BLOCK_SOUNDS_COMPILED = new HashMap<>();
 
     public static void load() {
         Path configDir = FabricLoader.getInstance().getConfigDir();
@@ -40,6 +43,7 @@ public class InfinoteConfig {
                 Infinote.LOGGER.info("could not found config. generating default...");
 
                 createDefault(path);
+                rebuildCache();
                 return;
             } else {
                 Infinote.LOGGER.info("Config found!");
@@ -49,6 +53,7 @@ public class InfinoteConfig {
             Type type = new TypeToken<Map<String, BlockSoundConfig>>(){}.getType();
             BLOCK_SOUNDS = GSON.fromJson(reader, type);
             reader.close();
+            rebuildCache();
 
             if (BLOCK_SOUNDS == null) {
                 throw new JsonParseException("[Infinote] Config not found.");
@@ -71,10 +76,19 @@ public class InfinoteConfig {
     }
 
     private static void createDefault(Path path) throws IOException {
-        Map<String, BlockSoundConfig> emptyMap = new HashMap<>();
+        Map<String, BlockSoundConfig> defaultMap = new HashMap<>();
+
+        String defaultBlockId = "minecraft:air";
+        BlockSoundConfig defaultConfig = new BlockSoundConfig();
+        defaultConfig.sound = "minecraft:block.note_block.harp";
+        defaultConfig.category = RECORDS;
+        defaultConfig.pitchShift = 0;
+        defaultConfig.volume = 3;
+
+        defaultMap.put(defaultBlockId, defaultConfig);
 
         try (Writer writer = Files.newBufferedWriter(path)) {
-            GSON.toJson(emptyMap, writer);
+            GSON.toJson(defaultMap, writer);
         }
     }
     public static void save() {
@@ -92,25 +106,58 @@ public class InfinoteConfig {
 
     public static void remove(String blockId) {
         BLOCK_SOUNDS.remove(blockId);
-        Infinote.LOGGER.info("smth removed in infinote conf");
         save();
+        rebuildCache();
     }
 
-    public static void add(ResourceLocation blockId, ResourceLocation soundId, SoundSource soundCategory, float pitch_shift, float volume) {
+    public static void add(String blockId, String soundId, SoundSource soundCategory, float pitchShift, float volume) {
         BlockSoundConfig config = new BlockSoundConfig();
-        config.sound = soundId.toString();
+        config.sound = soundId;
         config.category = soundCategory;
-        config.pitch_shift = pitch_shift;
+        config.pitchShift = pitchShift;
         config.volume = volume;
 
-        BLOCK_SOUNDS.put(blockId.toString(), config);
+        BLOCK_SOUNDS.put(blockId, config);
 
-        Infinote.LOGGER.info("smth added in infinote conf");
         save();
+        rebuildCache();
     }
 
-    public static boolean isInConfig(ResourceLocation blockId) {
-        return BLOCK_SOUNDS.containsKey(blockId.toString());
+    public static boolean isInConfig(String blockId) {
+        return BLOCK_SOUNDS.containsKey(blockId);
+    }
+
+    public static void rebuildCache() {
+        BLOCK_SOUNDS_COMPILED.clear();
+
+        for (var entry : BLOCK_SOUNDS.entrySet()) {
+            String blockKeyRaw = entry.getKey();
+            BlockSoundConfig config = entry.getValue();
+            if (config == null) continue;
+
+            String blockKey = IdCompat.normalize(blockKeyRaw);
+            String soundKey = IdCompat.normalize(config.sound);
+
+            if (blockKey == null || soundKey == null) {
+                Infinote.LOGGER.warn("Invalid config entry: block={}, sound={}", blockKeyRaw, config.sound);
+                continue;
+            }
+
+            SoundSource category;
+            try {
+                category = SoundSource.valueOf(config.category.toString().toUpperCase()); // 例
+            } catch (Exception e) {
+                Infinote.LOGGER.warn("Invalid category: {} (block={})", config.category, blockKeyRaw);
+                continue;
+            }
+
+            float pitchShift = config.pitchShift;
+            float volume = config.volume;
+
+            BLOCK_SOUNDS_COMPILED.put(blockKey, new BlockSoundConfigCompiled(blockKey, soundKey, category, pitchShift, volume));
+        }
+
+        Infinote.LOGGER.info("Compiled {} entries (raw={})", BLOCK_SOUNDS_COMPILED.size(), BLOCK_SOUNDS.size());
     }
 }
 

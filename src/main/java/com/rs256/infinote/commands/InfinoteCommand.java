@@ -1,17 +1,19 @@
 package com.rs256.infinote.commands;
 
+import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.compat.RegistryCompat;
+import com.rs256.infinote.config.InfinoteConfig;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.rs256.infinote.config.InfinoteConfig;
 import net.minecraft.commands.*;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 
 public class InfinoteCommand {
@@ -31,14 +33,21 @@ public class InfinoteCommand {
                                                             }
                                                             return builder.buildFuture();
                                                         })
-                                                        .then(Commands.argument("pitch_shift", FloatArgumentType.floatArg(-48))
+                                                        .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
                                                                 .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
                                                                         .executes(context -> {
 
                                                                             BlockInput blockArg = BlockStateArgument.getBlock(context, "block");
-                                                                            ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(blockArg.getState().getBlock());
-                                                                            ResourceLocation soundId = ResourceLocationArgument.getId(context, "sound");
+                                                                            String blockId = RegistryCompat.blockIdString(blockArg.getState().getBlock());
+                                                                            String soundId = IdCompat.normalize(ResourceLocationArgument.getId(context, "sound").toString());
                                                                             String rawCategory = StringArgumentType.getString(context, "category");
+
+                                                                            if (soundId == null) {
+                                                                                context.getSource().sendFailure(Component.literal("cant find any id with your input"));
+                                                                                return 0;
+                                                                            }
+
+
                                                                             SoundSource category;
                                                                             try {
                                                                                 category = SoundSource.valueOf(rawCategory.toUpperCase());
@@ -46,7 +55,7 @@ public class InfinoteCommand {
                                                                                 context.getSource().sendFailure(Component.literal("Invalid category: " + rawCategory));
                                                                                 return 0;
                                                                             }
-                                                                            float pitch_shift = FloatArgumentType.getFloat(context, "pitch_shift");
+                                                                            float pitch_shift = FloatArgumentType.getFloat(context, "pitchShift");
                                                                             float volume = FloatArgumentType.getFloat(context, "volume");
 
                                                                             InfinoteConfig.add(blockId, soundId, category, pitch_shift, volume);
@@ -65,7 +74,7 @@ public class InfinoteCommand {
                                 )
                         )
                         .then(Commands.literal("remove")
-                                .then(Commands.argument("block", ResourceLocationArgument.id())
+                                .then(Commands.argument("block",  StringArgumentType.word())
                                         .suggests((context, builder) -> {
                                             for (String key : InfinoteConfig.BLOCK_SOUNDS.keySet()) {
                                                 builder.suggest(key);
@@ -73,10 +82,10 @@ public class InfinoteCommand {
                                             return builder.buildFuture();
                                         })
                                         .executes(context -> {
-                                            ResourceLocation blockId = ResourceLocationArgument.getId(context, "block");
+                                            String blockId = StringArgumentType.getString(context, "block");
 
                                             if (InfinoteConfig.isInConfig(blockId)) {
-                                                InfinoteConfig.remove(blockId.toString());
+                                                InfinoteConfig.remove(blockId);
                                                 if (! InfinoteConfig.isInConfig(blockId)) {
                                                     context.getSource().sendSuccess(() -> Component.literal("Removed note for " + blockId), true);
                                                 }
@@ -86,6 +95,13 @@ public class InfinoteCommand {
                                             return 1;
                                         })
                                 )
+                        )
+                        .then(Commands.literal("reload")
+                                .executes(context -> {
+                                    InfinoteConfig.load();
+                                    context.getSource().sendSuccess(()->Component.literal("infinote reloaded!"), true);
+                                    return 1;
+                                })
                         )
         );
     }

@@ -1,11 +1,12 @@
 package com.rs256.infinote.client;
 
-import com.rs256.infinote.network.NetworkCompat;
+import com.rs256.infinote.Infinote;
+import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.compat.NetworkCompat;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -13,27 +14,31 @@ import net.minecraft.util.RandomSource;
 
 public class InfinoteClient implements ClientModInitializer {
 
+    private static final RandomSource RNG = RandomSource.create();
+
     @Override
     public void onInitializeClient() {
         NetworkCompat.registerClient();
     }
 
-    public static void playClientSound(ResourceLocation soundId,
-                                       SoundSource category,
-                                       float volume,
-                                       float pitch,
-                                       BlockPos pos) {
+    public static void playClientSound(String soundId, SoundSource category, float pitch, float volume, BlockPos pos) {
 
         Minecraft mc = Minecraft.getInstance();
 
-        if (mc.level == null) return;
+        if (mc.level == null) {
+            return;
+        }
+        if (IdCompat.idFromString(soundId) == null) {
+            Infinote.LOGGER.warn("Invalid sound id (client): {}", soundId);
+            return;
+        }
 
         SimpleSoundInstance sound = new SimpleSoundInstance(
-                soundId,
+                IdCompat.idFromString(soundId),
                 category,
                 volume,
                 pitch,
-                RandomSource.create(),
+                RNG,
                 false,
                 0,
                 SoundInstance.Attenuation.LINEAR,

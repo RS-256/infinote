@@ -18,8 +18,7 @@ public abstract class SoundEngineMixin {
                     target = "Lnet/minecraft/client/sounds/SoundEngine;calculatePitch(Lnet/minecraft/client/resources/sounds/SoundInstance;)F"
             )
     )
-    private float infinote_unclamp(SoundEngine instance, SoundInstance soundInstance) {
-        float pitch = soundInstance.getPitch();
-        return Mth.clamp(pitch, 0.03125f, 32.0f);
+    private float infinote_clamp(SoundEngine instance, SoundInstance soundInstance) {
+        return Mth.clamp(soundInstance.getPitch(), 0.03125f, 32.0f);
     }
 }
