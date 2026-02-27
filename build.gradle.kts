@@ -78,12 +78,14 @@ tasks {
         inputs.property("name", project.property("mod.name"))
         inputs.property("version", project.property("mod.version"))
         inputs.property("minecraft", project.property("mod.mc_dep"))
+        inputs.property("fabricAPI", project.property("deps.fabric_api"))
 
         val props = mapOf(
             "id" to project.property("mod.id"),
             "name" to project.property("mod.name"),
             "version" to project.property("mod.version"),
-            "minecraft" to project.property("mod.mc_dep")
+            "minecraft" to project.property("mod.mc_dep"),
+            "fabricAPI" to project.property("deps.fabric_api")
         )
 
         filesMatching("fabric.mod.json") { expand(props) }
@@ -106,6 +108,20 @@ tasks {
         group = "build"
         from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+        dependsOn("build")
+    }
+
+    register<Copy>("buildAndCollectRemap") {
+        group = "build"
+        from(remapJar.map { it.archiveFile })
+        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}/remapped"))
+        dependsOn("build")
+    }
+
+    register<Copy>("buildAndCollectSources") {
+        group = "build"
+        from(remapSourcesJar.map { it.archiveFile })
+        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}/sources"))
         dependsOn("build")
     }
 }
