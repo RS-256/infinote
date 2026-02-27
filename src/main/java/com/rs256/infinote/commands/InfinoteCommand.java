@@ -24,9 +24,9 @@ public class InfinoteCommand {
                                 .then(Commands.argument("block", BlockStateArgument.block(registryAccess))
                                         .then(Commands.argument("sound", IdStringArgumentType.id())
                                                 //? if <1.21 {
-                                                /*.suggests(SuggestionProviders.AVAILABLE_SOUNDS)
-                                                *///?} else
-                                                .suggests(SuggestionProviders.cast(SuggestionProviders.AVAILABLE_SOUNDS))
+                                                .suggests(SuggestionProviders.AVAILABLE_SOUNDS)
+                                                //?} else
+                                                //.suggests(SuggestionProviders.cast(SuggestionProviders.AVAILABLE_SOUNDS))
 
                                                 .then(Commands.argument("category", StringArgumentType.word())
                                                         .suggests((context, builder) -> {

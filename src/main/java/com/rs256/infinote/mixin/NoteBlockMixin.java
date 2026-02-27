@@ -1,16 +1,13 @@
 package com.rs256.infinote.mixin;
 
 import com.rs256.infinote.compat.IdCompat;
-import com.rs256.infinote.compat.RegistryCompat;
 import com.rs256.infinote.config.BlockSoundConfigCompiled;
 import com.rs256.infinote.config.InfinoteConfig;
 
-import com.rs256.infinote.compat.NetworkCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -43,28 +40,16 @@ public class NoteBlockMixin {
                 return;
             }
 
-            if (RegistryCompat.isSoundEventRegistered(c.sound)) {
-                SoundEvent soundEvent = RegistryCompat.getRegisteredSoundEvent(c.sound);
-                float shiftedNote = note + c.pitchShift;
-                float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
+            SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundId);
 
-                world.playSound(null, pos, soundEvent, c.category, c.volume, pitch);
-            } else {
-                float shiftedNote = note + c.pitchShift;
-                float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
-                ServerLevel serverWorld = (ServerLevel) world;
+            float shiftedNote = note + c.pitchShift;
+            float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
+            ServerLevel serverWorld = (ServerLevel) world;
 
-                for (ServerPlayer p : serverWorld.players()) {
-                    if (p.blockPosition().closerThan(pos, c.volume * 16)) {
-                        NetworkCompat.sendPlayCustomSound(p, c.sound, c.category, pitch, c.volume, pos);
-                    }
-                }
-            }
+            world.playSound(null, pos, soundEvent, c.category, c.volume, pitch);
 
-            if (world instanceof ServerLevel serverWorld) {
-                double d = (double) note / 24.0D;
-                serverWorld.sendParticles(ParticleTypes.NOTE, pos.getX() + 0.5D, pos.getY() + 1.2D, pos.getZ() + 0.5D, 0, d, 0.0D, 0.0D, 1.0D);
-            }
+            double d = (double) note / 24.0D;
+            serverWorld.sendParticles(ParticleTypes.NOTE, pos.getX() + 0.5D, pos.getY() + 1.2D, pos.getZ() + 0.5D, 0, d, 0.0D, 0.0D, 1.0D);
 
             ci.cancel();
         }
