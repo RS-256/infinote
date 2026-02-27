@@ -9,7 +9,6 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.commands.*;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,7 +23,7 @@ public class InfinoteCommand {
                 Commands.literal("infinote")
                         .then(Commands.literal("add")
                                 .then(Commands.argument("block", BlockStateArgument.block(registryAccess))
-                                        .then(Commands.argument("sound", ResourceLocationArgument.id())
+                                        .then(Commands.argument("sound", StringArgumentType.word())
                                                 .suggests(SOUND_ID_SUGGESTIONS)
                                                 .then(Commands.argument("category", StringArgumentType.word())
                                                         .suggests((context, builder) -> {
@@ -39,7 +38,7 @@ public class InfinoteCommand {
 
                                                                             BlockInput blockArg = BlockStateArgument.getBlock(context, "block");
                                                                             String blockId = RegistryCompat.blockIdString(blockArg.getState().getBlock());
-                                                                            String soundId = IdCompat.normalize(ResourceLocationArgument.getId(context, "sound").toString());
+                                                                            String soundId = IdCompat.normalize(StringArgumentType.getString(context, "sound"));
                                                                             String rawCategory = StringArgumentType.getString(context, "category");
 
                                                                             if (soundId == null) {

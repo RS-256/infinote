@@ -1,11 +1,14 @@
 package com.rs256.infinote.compat;
 
+//? if <1.21 {
 import net.minecraft.resources.ResourceLocation;
+ //?} else
+//import net.minecraft.resources.Identifier;
 
 public final class IdCompat {
     private IdCompat() {}
 
-    /** "path" → "minecraft:path" にする等、最低限の正規化 */
+    // "path" → "minecraft:path" にする等、最低限の正規化
     public static String normalize(String raw) {
         if (raw == null) return null;
         String s = raw.trim();
@@ -14,32 +17,38 @@ public final class IdCompat {
         return s;
     }
 
-    /** "namespace:path" を分解して作る（namespace省略はminecraft扱い） */
+
+    //? if <1.21 {
     public static ResourceLocation idFromString(String raw) {
         String s = normalize(raw);
-        if (s == null) {
-            return null;
-        }
-        int i = s.indexOf(":");
-        if (i<=0 || i>=s.length() - 1) {
-            return null;
-        }
+        if (s == null) return null;
+
+        int i = s.indexOf(':');
+        if (i <= 0 || i >= s.length() - 1) return null;
 
         String namespace = s.substring(0, i);
         String path = s.substring(i + 1);
+        return idFromNamespaceAndPath(namespace, path);
+    }
 
+    public static ResourceLocation idFromNamespaceAndPath(String namespace, String path) {
         return new ResourceLocation(namespace, path);
-        /*
-        1.21+
-        return ResourceLocation.of(ns, path);
-         */
     }
-    /** namespace/path から作る */
-    public static ResourceLocation idFromSpaceAndPath(String namespace, String path){
-        return new ResourceLocation(namespace, path);
-        /*
-        1.21+
-        return ResourceLocation.of(namespace, path);
-         */
+    //?} else {
+    /*public static Identifier idFromString(String raw) {
+        String s = normalize(raw);
+        if (s == null) return null;
+
+        int i = s.indexOf(':');
+        if (i <= 0 || i >= s.length() - 1) return null;
+
+        String namespace = s.substring(0, i);
+        String path = s.substring(i + 1);
+        return idFromNamespaceAndPath(namespace, path);
     }
+
+    public static Identifier idFromNamespaceAndPath(String namespace, String path) {
+        return Identifier.fromNamespaceAndPath(namespace, path);
+    }
+    *///?}
 }

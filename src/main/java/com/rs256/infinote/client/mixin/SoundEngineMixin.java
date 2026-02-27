@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class SoundEngineMixin {
 
     @Redirect(
-            method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V",
+            method = "play",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/sounds/SoundEngine;calculatePitch(Lnet/minecraft/client/resources/sounds/SoundInstance;)F"

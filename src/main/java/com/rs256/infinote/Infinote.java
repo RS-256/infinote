@@ -1,11 +1,10 @@
 package com.rs256.infinote;
 
 import com.rs256.infinote.commands.InfinoteCommand;
+import com.rs256.infinote.compat.NetworkCompat;
 import com.rs256.infinote.config.InfinoteConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.resources.ResourceLocation;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,6 @@ public class Infinote implements ModInitializer {
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final ResourceLocation PLAY_CUSTOM_SOUND = id(MOD_ID, "play_custom_sound");
 
 
 	@Override
@@ -31,13 +29,8 @@ public class Infinote implements ModInitializer {
 		LOGGER.info("He said the sky is the limit!");
 		InfinoteConfig.load();
 		registerCommands();
-	}
-
-	public static ResourceLocation id(String namespace, String path) {
-		//? if <1.21 {
-		return new ResourceLocation(namespace, path);
-		//?} else
-		//return ResourceLocation.fromNamespaceAndPath(namespace, path);
+		//? if >=1.21
+		//NetworkCompat.registerPayloadTypes();
 	}
 
 	public void registerCommands() {
