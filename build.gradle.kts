@@ -126,6 +126,22 @@ tasks {
     }
 }
 
+val mcVersion = sc.current.version
+
+tasks.named<AbstractArchiveTask>("remapJar") {
+    // infinote-v0.1.0-mc1.21.11.jar
+    archiveFileName.set(
+        "${project.property("mod.id")}-v${project.property("mod.version")}-mc${mcVersion}.jar"
+    )
+}
+
+tasks.named<AbstractArchiveTask>("sourcesJar") {
+    // infinote-v0.1.0-mc1.21.11.jar
+    archiveFileName.set(
+        "${project.property("mod.id")}-v${project.property("mod.version")}-mc${mcVersion}-source.jar"
+    )
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }
