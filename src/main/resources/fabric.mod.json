@@ -8,10 +8,9 @@
 		"RS256"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/RS-256/infinote"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/infinote/icon.png",
 	"environment": "*",
 	"entrypoints": {
