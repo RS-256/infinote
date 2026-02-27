@@ -1,9 +1,9 @@
 package com.rs256.infinote.compat;
 
 //? if <1.21 {
-import net.minecraft.resources.ResourceLocation;
-//?} else
-//import net.minecraft.resources.Identifier;
+/*import net.minecraft.resources.ResourceLocation;
+*///?} else
+import net.minecraft.resources.Identifier;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
@@ -25,9 +25,9 @@ public final class RegistryCompat {
         }
 
         //? if <1.21 {
-        ResourceLocation id = IdCompat.idFromString(normalized);
-        //?} else
-        //Identifier id = IdCompat.idFromString(normalized);
+        /*ResourceLocation id = IdCompat.idFromString(normalized);
+        *///?} else
+        Identifier id = IdCompat.idFromString(normalized);
 
         if (id == null) {
             return false;
@@ -43,7 +43,7 @@ public final class RegistryCompat {
         }
 
         //? if <1.21 {
-        ResourceLocation id = IdCompat.idFromString(key);
+        /*ResourceLocation id = IdCompat.idFromString(key);
         if (id == null) {
             return null;
         }
@@ -51,8 +51,8 @@ public final class RegistryCompat {
             return null;
         }
         return BuiltInRegistries.SOUND_EVENT.get(id);
-        //?} else {
-        /*Identifier id = IdCompat.idFromString(key);
+        *///?} else {
+        Identifier id = IdCompat.idFromString(key);
         if (id == null) {
             return null;
         }
@@ -60,6 +60,6 @@ public final class RegistryCompat {
             return null;
         }
         return BuiltInRegistries.SOUND_EVENT.getValue(id);
-        *///?}
+        //?}
     }
 }

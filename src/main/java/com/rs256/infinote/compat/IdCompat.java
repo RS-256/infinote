@@ -1,9 +1,9 @@
 package com.rs256.infinote.compat;
 
 //? if <1.21 {
-import net.minecraft.resources.ResourceLocation;
- //?} else
-//import net.minecraft.resources.Identifier;
+/*import net.minecraft.resources.ResourceLocation;
+ *///?} else
+import net.minecraft.resources.Identifier;
 
 public final class IdCompat {
     private IdCompat() {}
@@ -19,7 +19,7 @@ public final class IdCompat {
 
 
     //? if <1.21 {
-    public static ResourceLocation idFromString(String raw) {
+    /*public static ResourceLocation idFromString(String raw) {
         String s = normalize(raw);
         if (s == null) return null;
 
@@ -34,8 +34,8 @@ public final class IdCompat {
     public static ResourceLocation idFromNamespaceAndPath(String namespace, String path) {
         return new ResourceLocation(namespace, path);
     }
-    //?} else {
-    /*public static Identifier idFromString(String raw) {
+    *///?} else {
+    public static Identifier idFromString(String raw) {
         String s = normalize(raw);
         if (s == null) return null;
 
@@ -50,5 +50,5 @@ public final class IdCompat {
     public static Identifier idFromNamespaceAndPath(String namespace, String path) {
         return Identifier.fromNamespaceAndPath(namespace, path);
     }
-    *///?}
+    //?}
 }
