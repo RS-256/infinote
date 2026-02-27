@@ -8,13 +8,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 //? if <1.21 {
 
- import net.minecraft.resources.ResourceLocation;
-//?} else {
-/*import net.minecraft.resources.Identifier;
+ /*import net.minecraft.resources.ResourceLocation;
+*///?} else {
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-*///?}
+//?}
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -23,7 +23,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 public class NetworkCompat {
     //? if <1.21 {
     
-     public static final ResourceLocation PLAY_CUSTOM_SOUND = IdCompat.idFromNamespaceAndPath(Infinote.MOD_ID, "play_custom_sound");
+     /*public static final ResourceLocation PLAY_CUSTOM_SOUND = IdCompat.idFromNamespaceAndPath(Infinote.MOD_ID, "play_custom_sound");
 
      public static void registerClient(){
         ClientPlayNetworking.registerGlobalReceiver(
@@ -50,9 +50,9 @@ public class NetworkCompat {
 
         ServerPlayNetworking.send(player, PLAY_CUSTOM_SOUND, buf);
     }
-    //?} else {
+    *///?} else {
 
-    /*public static final Identifier PLAY_CUSTOM_SOUND_ID = IdCompat.idFromNamespaceAndPath(Infinote.MOD_ID, "play_custom_sound");
+    public static final Identifier PLAY_CUSTOM_SOUND_ID = IdCompat.idFromNamespaceAndPath(Infinote.MOD_ID, "play_custom_sound");
 
     public static final CustomPacketPayload.Type<PlayCustomSoundS2CPayload> PLAY_CUSTOM_SOUND = new CustomPacketPayload.Type<>(PLAY_CUSTOM_SOUND_ID);
 
@@ -120,6 +120,6 @@ public class NetworkCompat {
 
 
 
-    *///?}
+    //?}
 
 }

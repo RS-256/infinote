@@ -1,25 +1,21 @@
 package com.rs256.infinote.compat;
 
 //? if <1.21 {
-import net.minecraft.resources.ResourceLocation;
-//?} else
-//import net.minecraft.resources.Identifier;
+/*import net.minecraft.resources.ResourceLocation;
+*///?} else
+import net.minecraft.resources.Identifier;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.level.block.Block;
 
 
 public final class RegistryCompat {
     private RegistryCompat() {}
 
-    /** Block -> "namespace:path"（常にStringで返す） */
-    public static String blockIdString(Block block) {
-        //? if <1.21 {
-        return BuiltInRegistries.BLOCK.getKey(block).toString();
-        //?} else
-        //return BuiltInRegistries.BLOCK.getKey(block).toString();
-    }
+    /** String: Block -> "namespace:path" */
+//    public static String blockIdString(Block block) {
+//        return BuiltInRegistries.BLOCK.getKey(block).toString();
+//    }
 
     /** Sound id が「登録済み（=バニラ/既存）」かどうか */
     public static boolean isSoundEventRegistered(String soundIdString) {
@@ -29,9 +25,9 @@ public final class RegistryCompat {
         }
 
         //? if <1.21 {
-        ResourceLocation id = IdCompat.idFromString(normalized);
-        //?} else
-        //Identifier id = IdCompat.idFromString(normalized);
+        /*ResourceLocation id = IdCompat.idFromString(normalized);
+        *///?} else
+        Identifier id = IdCompat.idFromString(normalized);
 
         if (id == null) {
             return false;
@@ -47,7 +43,7 @@ public final class RegistryCompat {
         }
 
         //? if <1.21 {
-        ResourceLocation id = IdCompat.idFromString(key);
+        /*ResourceLocation id = IdCompat.idFromString(key);
         if (id == null) {
             return null;
         }
@@ -55,8 +51,8 @@ public final class RegistryCompat {
             return null;
         }
         return BuiltInRegistries.SOUND_EVENT.get(id);
-        //?} else {
-        /*Identifier id = IdCompat.idFromString(key);
+        *///?} else {
+        Identifier id = IdCompat.idFromString(key);
         if (id == null) {
             return null;
         }
@@ -64,6 +60,6 @@ public final class RegistryCompat {
             return null;
         }
         return BuiltInRegistries.SOUND_EVENT.getValue(id);
-        *///?}
+        //?}
     }
 }

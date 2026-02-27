@@ -8,6 +8,7 @@ import com.rs256.infinote.config.InfinoteConfig;
 import com.rs256.infinote.compat.NetworkCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -31,7 +32,7 @@ public class NoteBlockMixin {
 
         BlockPos belowPos = pos.below(1);
 
-        String belowBlock = RegistryCompat.blockIdString(world.getBlockState(belowPos).getBlock()); // これも後でcompat化
+        String belowBlock = BuiltInRegistries.BLOCK.getKey(world.getBlockState(belowPos).getBlock()).toString();
         BlockSoundConfigCompiled c = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(belowBlock);
 
         if (c != null) {

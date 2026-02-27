@@ -1,6 +1,7 @@
 package com.rs256.infinote;
 
 import com.rs256.infinote.commands.InfinoteCommand;
+import com.rs256.infinote.commands.argument.IdStringArgumentType;
 import com.rs256.infinote.compat.NetworkCompat;
 import com.rs256.infinote.config.InfinoteConfig;
 import net.fabricmc.api.ModInitializer;
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class Infinote implements ModInitializer {
 	public static final String MOD_ID = "infinote";
 	public static final String VERSION = /*$ mod_version*/ "0.1.0";
-	public static final String MINECRAFT = /*$ minecraft*/ "1.20.1";
+	public static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -29,8 +30,9 @@ public class Infinote implements ModInitializer {
 		LOGGER.info("He said the sky is the limit!");
 		InfinoteConfig.load();
 		registerCommands();
+		IdStringArgumentType.registerArgumentTypes();
 		//? if >=1.21
-		//NetworkCompat.registerPayloadTypes();
+		NetworkCompat.registerPayloadTypes();
 	}
 
 	public void registerCommands() {

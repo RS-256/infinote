@@ -1,16 +1,15 @@
 package com.rs256.infinote.commands;
 
+import com.rs256.infinote.commands.argument.IdStringArgumentType;
 import com.rs256.infinote.compat.IdCompat;
-import com.rs256.infinote.compat.RegistryCompat;
 import com.rs256.infinote.config.InfinoteConfig;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.commands.*;
-import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -23,8 +22,12 @@ public class InfinoteCommand {
                 Commands.literal("infinote")
                         .then(Commands.literal("add")
                                 .then(Commands.argument("block", BlockStateArgument.block(registryAccess))
-                                        .then(Commands.argument("sound", StringArgumentType.word())
-                                                .suggests(SOUND_ID_SUGGESTIONS)
+                                        .then(Commands.argument("sound", IdStringArgumentType.id())
+                                                //? if <1.21 {
+                                                /*.suggests(SuggestionProviders.AVAILABLE_SOUNDS)
+                                                *///?} else
+                                                .suggests(SuggestionProviders.cast(SuggestionProviders.AVAILABLE_SOUNDS))
+
                                                 .then(Commands.argument("category", StringArgumentType.word())
                                                         .suggests((context, builder) -> {
                                                             for (SoundSource cat : SoundSource.values()) {
@@ -35,18 +38,9 @@ public class InfinoteCommand {
                                                         .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
                                                                 .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
                                                                         .executes(context -> {
-
-                                                                            BlockInput blockArg = BlockStateArgument.getBlock(context, "block");
-                                                                            String blockId = RegistryCompat.blockIdString(blockArg.getState().getBlock());
-                                                                            String soundId = IdCompat.normalize(StringArgumentType.getString(context, "sound"));
+                                                                            String blockId = BuiltInRegistries.BLOCK.getKey(BlockStateArgument.getBlock(context, "block").getState().getBlock()).toString();
+                                                                            String soundId = IdCompat.normalize(IdStringArgumentType.getId(context, "sound"));
                                                                             String rawCategory = StringArgumentType.getString(context, "category");
-
-                                                                            if (soundId == null) {
-                                                                                context.getSource().sendFailure(Component.literal("cant find any id with your input"));
-                                                                                return 0;
-                                                                            }
-
-
                                                                             SoundSource category;
                                                                             try {
                                                                                 category = SoundSource.valueOf(rawCategory.toUpperCase());
@@ -73,7 +67,8 @@ public class InfinoteCommand {
                                 )
                         )
                         .then(Commands.literal("remove")
-                                .then(Commands.argument("block",  StringArgumentType.word())
+
+                                .then(Commands.argument("block",  BlockStateArgument.block(registryAccess))
                                         .suggests((context, builder) -> {
                                             for (String key : InfinoteConfig.BLOCK_SOUNDS.keySet()) {
                                                 builder.suggest(key);
@@ -81,7 +76,7 @@ public class InfinoteCommand {
                                             return builder.buildFuture();
                                         })
                                         .executes(context -> {
-                                            String blockId = StringArgumentType.getString(context, "block");
+                                            String blockId = BuiltInRegistries.BLOCK.getKey(BlockStateArgument.getBlock(context, "block").getState().getBlock()).toString();
 
                                             if (InfinoteConfig.isInConfig(blockId)) {
                                                 InfinoteConfig.remove(blockId);
@@ -104,10 +99,4 @@ public class InfinoteCommand {
                         )
         );
     }
-
-    private static final SuggestionProvider<CommandSourceStack> SOUND_ID_SUGGESTIONS =
-            (context, builder) -> SharedSuggestionProvider.suggestResource(
-                    BuiltInRegistries.SOUND_EVENT.keySet(),
-                    builder
-            );
 }
