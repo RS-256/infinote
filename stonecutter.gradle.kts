@@ -21,3 +21,15 @@ stonecutter parameters {
     constants["release"] = property("mod.id") != "template"
     dependencies["fapi"] = node.project.property("deps.fabric_api") as String
 }
+
+tasks.register("runClientCurrentVersion") {
+    group = "run"
+    description = "Runs :<current>:runClient only."
+    dependsOn(project(":${sc.current?.version}").tasks.named("runClient"))
+}
+
+tasks.register("runServerCurrentVersion") {
+    group = "run"
+    description = "Runs :<current>:runServer only."
+    dependsOn(project(":${sc.current?.version}").tasks.named("runServer"))
+}
