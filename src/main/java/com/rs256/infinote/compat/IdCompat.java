@@ -1,12 +1,13 @@
 package com.rs256.infinote.compat;
 
-//? if <1.21 {
+//? if <=1.21.10 {
 /*import net.minecraft.resources.ResourceLocation;
  *///?} else
 import net.minecraft.resources.Identifier;
 
 public final class IdCompat {
-    private IdCompat() {}
+    private IdCompat() {
+    }
 
     // "path" → "minecraft:path" にする等、最低限の正規化
     public static String normalize(String raw) {
@@ -18,7 +19,7 @@ public final class IdCompat {
     }
 
 
-    //? if <1.21 {
+    //? if <=1.21.10 {
     /*public static ResourceLocation idFromString(String raw) {
         String s = normalize(raw);
         if (s == null) return null;
@@ -31,9 +32,6 @@ public final class IdCompat {
         return idFromNamespaceAndPath(namespace, path);
     }
 
-    public static ResourceLocation idFromNamespaceAndPath(String namespace, String path) {
-        return new ResourceLocation(namespace, path);
-    }
     *///?} else {
     public static Identifier idFromString(String raw) {
         String s = normalize(raw);
@@ -46,9 +44,21 @@ public final class IdCompat {
         String path = s.substring(i + 1);
         return idFromNamespaceAndPath(namespace, path);
     }
+    //?}
 
+    //?if <=1.21.8 {
+    /*public static ResourceLocation idFromNamespaceAndPath(String namespace, String path) {
+        return new ResourceLocation(namespace, path);
+    }
+
+    
+    *///?} else if <=1.21.10 {
+    /*public static ResourceLocation idFromNamespaceAndPath(String namespace, String path) {
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+    }
+     *///?} else {
     public static Identifier idFromNamespaceAndPath(String namespace, String path) {
         return Identifier.fromNamespaceAndPath(namespace, path);
     }
-    //?}
+     //?}
 }
