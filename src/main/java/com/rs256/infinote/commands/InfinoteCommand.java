@@ -1,7 +1,9 @@
 package com.rs256.infinote.commands;
 
+import com.rs256.infinote.Infinote;
 import com.rs256.infinote.commands.argument.IdStringArgumentType;
 import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.config.ImportConfig;
 import com.rs256.infinote.config.InfinoteConfig;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -25,9 +27,9 @@ public class InfinoteCommand {
                                         .then(Commands.argument("sound", IdStringArgumentType.id())
                                                 //? if <1.21 {
                                                 /*.suggests(SuggestionProviders.AVAILABLE_SOUNDS)
-                                                *///?} else
+                                                *///?} else {
                                                 .suggests(SuggestionProviders.cast(SuggestionProviders.AVAILABLE_SOUNDS))
-
+                                                //?}
                                                 .then(Commands.argument("category", StringArgumentType.word())
                                                         .suggests((context, builder) -> {
                                                             for (SoundSource cat : SoundSource.values()) {
@@ -96,6 +98,21 @@ public class InfinoteCommand {
                                     context.getSource().sendSuccess(()->Component.literal("infinote reloaded!"), true);
                                     return 1;
                                 })
+                        )
+                        .then(Commands.literal("import")
+                                .then(Commands.literal("notebetterfabric")
+                                        .then(Commands.argument("json", StringArgumentType.word())
+                                                .executes(context -> {
+                                                    String fileName = StringArgumentType.getString(context, "json");
+                                                    int count = ImportConfig.FromNotebetterfabric(fileName); // 追加する
+                                                    if (count == 0) {
+                                                        context.getSource().sendFailure(Component.literal("The file: " + fileName + " does not exist, or is not in the correct notebetterfabric.json format, or has zero entries."));
+                                                    }
+                                                    context.getSource().sendSuccess(() -> Component.literal("Imported " + count + " mappings from " + fileName), true);
+                                                    return 1;
+                                                })
+                                        )
+                                )
                         )
         );
     }

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public class Infinote implements ModInitializer {
 	public static final String MOD_ID = "infinote";
-	public static final String VERSION = /*$ mod_version*/ "0.2.0";
+	public static final String VERSION = /*$ mod_version*/ "0.3.0";
 	public static final String MINECRAFT = /*$ minecraft*/ "1.21.11";
 
 	// This logger is used to write text to the console and the log file.
