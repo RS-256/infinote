@@ -17,6 +17,7 @@ stonecutter {
         // See https://stonecutter.kikugie.dev/wiki/start/#choosing-minecraft-versions
         versions(
             "1.20.1",
+            "1.21.3",
             "1.21.4",
             "1.21.5",
             "1.21.6",
