@@ -46,7 +46,7 @@ public final class IdCompat {
     }
     //?}
 
-    //?if <=1.21 {
+    //?if <=1.20.6 {
     /*public static ResourceLocation idFromNamespaceAndPath(String namespace, String path) {
         return new ResourceLocation(namespace, path);
     }
