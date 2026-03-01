@@ -230,6 +230,43 @@ In the above example, you should send command:
 
 ---
 
+## 🔄 Migration from NotebetterFabric
+
+Infinote provides a built-in migration command for users coming from **NotebetterFabric**.
+
+You can import an existing NotebetterFabric configuration file directly:
+
+```
+/infinote import notebetterfabric <json>
+```
+
+- `<json>`: Path to your existing NotebetterFabric configuration file
+
+The command reads the JSON file and converts it into Infinote format automatically.
+
+### Why migrate?
+
+Compared to NotebetterFabric, Infinote:
+
+- Runs primarily on the **server side**
+- Supports extended pitch ranges (with client mod installed)
+- Allows floating-point semitone pitch shifting
+- multiplayer compatible
+
+After importing, use:
+
+```
+/infinote reload
+```
+
+to apply the converted configuration.
+
+Always keep a backup of your original JSON file before importing.
+
+Migration is designed to make switching seamless while preserving your existing sound mappings.
+
+---
+
 ## 📜 License
 
 This project is licensed under the **MIT License**.
