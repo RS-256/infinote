@@ -64,20 +64,84 @@ https://youtu.be/your-video-id
 Adds or updates a sound mapping for the specified block.
 
 - `<block>`: Target block ID (e.g. minecraft:stone)
-- `<sound>`: **Any valid sound ID** (not limited to built-in sounds; see below)
+- `<sound>`: Any valid sound ID (not limited to built-in sounds)
 - `<category>`: Sound category (e.g. master, music, record, block, etc.)
-- `<pitchShift>`: Pitch multiplier (e.g. 1.0)
-- `<volume>`: Volume multiplier (e.g. 1.0)
+- `<pitchShift>`: Pitch shift in semitones (accepts **float**)
+- `<volume>`: Volume multiplier (float)
 
-### About `<sound>`
+---
 
-The `<sound>` argument is **not restricted to vanilla or built-in sound events**.
+```
+/infinote remove <block>
+```
 
-You can use:
+Removes the sound mapping for the specified block.
+
+---
+
+```
+/infinote reload
+```
+
+Reloads the configuration.
+
+---
+
+```
+/infinote import notebetterfabric <json>
+```
+
+Imports configuration from a **NotebetterFabric-style JSON file**  
+and converts it into Infinote format.
+
+- `<json>`: Path to the NotebetterFabric configuration file
+
+This command allows easy migration from NotebetterFabric to Infinote.
+
+---
+
+### 🎵 About `pitchShift`
+
+`pitchShift` represents pitch change in **semitones**.
+
+- `12` = +12 semitones = +1 octave
+- `-12` = -12 semitones = -1 octave
+- `0` = no pitch change
+
+Unlike vanilla Note Blocks, `pitchShift`:
+
+- Accepts **floating-point values**
+- Is **not limited to 12-tone equal temperament**
+- Allows microtonal adjustments (e.g. `0.5`, `-2.3`, etc.)
+
+---
+
+### 📏 Pitch Clamp Behavior
+
+Minecraft internally clamps pitch values.
+
+### Without the client mod installed
+
+Vanilla pitch clamping applies.  
+If the calculated pitch exceeds vanilla limits, it will be clamped by the client.
+
+### With the client mod installed
+
+Pitch clamp range is expanded to:`[0.03125, 32.0]`, witch means you can change pitch within: -5va ~ +5va
+
+note that for full extended pitch range, client installation is needed.
+
+---
+
+### 🔊 About `<sound>`
+
+The `<sound>` argument is **not restricted to vanilla sound events**.
+
+You may use:
 
 - Custom namespaces
 - Custom paths
-- Any ID defined inside a resource pack
+- Any id defined inside a resourcepack
 
 It does **NOT** need to start with `minecraft:`.
 
@@ -88,15 +152,14 @@ minecraft:block.note_block.harp
 custom:piano
 my_music:grand.piano
 ```
+you cannot use nested namespace, like `infinote.custom:piano`, or `smoe:namespace:your_path`.
 
-### Allowed Characters
-
-The `<sound>` ID may contain:
+The `<sound>` can contain:
 
 - Lowercase letters (`a-z`)
 - Numbers (`0-9`)
 - Underscore (`_`)
-- One colon (`:`)
+- Only one colon (`:`)
 - Dot (`.`)
 
 Format:
@@ -107,48 +170,44 @@ Format:
 
 Only **one colon** is allowed.
 
----
-
-```
-/infinote remove <block>
-```
-
-Removes the sound mapping for the specified block.
-
-```
-/infinote reload
-```
-
-Reloads the configuration.
-
 </details>
 
-## 🎵 Resource Pack (Vanilla Structure)
+## 🎵 Resourcepack (Vanilla Structure)
 
-Custom sounds must follow the standard Minecraft resourcepack structure:
+follow the standard Minecraft resourcepack structure:
 
 <details>
 <summary><strong>Click to expand resourcepack structure</strong></summary>
 
 ```
 resourcepack/
-└── assets/
-    └── <namespace>/
-        ├── sounds.json
-        └── sounds/
-            └── example_sound.ogg
+└─ assets/
+    └─ <namespace>/
+        ├─ sounds.json
+        └─ sounds/
+            ├─ example_sound.ogg
+            └─ smth_ur_folder/
+               └─ nested/
+                  └─ your_sound.ogg
+            
 ```
 
 Example `sounds.json`:
 
 ```json
 {
-  "custom.sound": {
+  "your_sound": {
+    "category": "record",
+    "replace": false,
     "sounds": [
-      {
-        "name": "<namespace>:example_sound",
-        "stream": false
-      }
+      "example_sound"
+    ]
+  },
+  "sound_id_in_the_command": {
+    "category": "record",
+    "replace": false,
+    "sounds": [
+      "smth_ur_folder/nested/your_sound"
     ]
   }
 }
@@ -157,7 +216,14 @@ Example `sounds.json`:
 After defining the sound in `sounds.json`, use its full ID in the command:
 
 ```
-/infinote add minecraft:stone <namespace>:custom.sound block 0 3.0
+/infinote add minecraft:stone <namespace>:custom.sound block 0 3
+```
+
+In the above example, you should send command:
+
+```
+/infinote add minecraft:stone <mamespace>:your_sound records 0 3
+/infinote add minecraft:white_concrete <mamespace>:sound_id_in_the_command records 0 3
 ```
 
 </details>
