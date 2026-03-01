@@ -1,7 +1,6 @@
 package com.rs256.infinote.commands;
 
 import com.rs256.infinote.Infinote;
-import com.rs256.infinote.commands.argument.IdStringArgumentType;
 import com.rs256.infinote.compat.IdCompat;
 import com.rs256.infinote.config.ImportConfig;
 import com.rs256.infinote.config.InfinoteConfig;
@@ -10,6 +9,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.*;
+//? if <=1.21.10 {
+/*import net.minecraft.commands.arguments.ResourceLocationArgument;
+*///?} else {
+import net.minecraft.commands.arguments.IdentifierArgument;
+//?}
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,7 +28,13 @@ public class InfinoteCommand {
                 Commands.literal("infinote")
                         .then(Commands.literal("add")
                                 .then(Commands.argument("block", BlockStateArgument.block(registryAccess))
-                                        .then(Commands.argument("sound", IdStringArgumentType.id())
+                                        //? if <=1.21.10 {
+                                        
+                                        /*.then(Commands.argument("sound", ResourceLocationArgument.id())
+                                        *///?} else {
+                                        .then(Commands.argument("sound", IdentifierArgument.id())
+                                        //?}
+
                                                 //? if <=1.21.5 {
                                                 /*.suggests(SuggestionProviders.AVAILABLE_SOUNDS)
                                                 *///?} else {
@@ -41,7 +51,13 @@ public class InfinoteCommand {
                                                                 .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
                                                                         .executes(context -> {
                                                                             String blockId = BuiltInRegistries.BLOCK.getKey(BlockStateArgument.getBlock(context, "block").getState().getBlock()).toString();
-                                                                            String soundId = IdCompat.normalize(IdStringArgumentType.getId(context, "sound"));
+                                                                            //? if <=1.21.10 {
+                                                                            
+                                                                             /*String soundId = IdCompat.normalize(ResourceLocationArgument.getId(context, "sound").toString());
+                                                                            *///?} else {
+                                                                            String soundId = IdCompat.normalize(IdentifierArgument.getId(context, "sound").toString());
+                                                                            //?}
+
                                                                             String rawCategory = StringArgumentType.getString(context, "category");
                                                                             SoundSource category;
                                                                             try {
