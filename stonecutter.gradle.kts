@@ -33,3 +33,16 @@ tasks.register("runServerCurrentVersion") {
     description = "Runs :<current>:runServer only."
     dependsOn(project(":${sc.current?.version}").tasks.named("runServer"))
 }
+
+val releaseVersions = listOf(
+    "1.20.6",
+    "1.21.5",
+    "1.21.9",
+    "1.21.11"
+)
+
+tasks.register("buildReleaseRemap") {
+    group = "build"
+    description = "Build remapped jars only for release representative versions."
+    dependsOn(releaseVersions.map { v -> ":$v:buildAndCollectRemap" })
+}
