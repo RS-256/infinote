@@ -32,7 +32,7 @@ public class ImportConfig {
         double pitch;
     }
 
-    public static int FromNotebetterfabric(String sourceFileName) {
+    public static int fromNotebetterfabric(String sourceFileName) {
         Path configDir = FabricLoader.getInstance().getConfigDir();
         Path source = configDir.resolve(sourceFileName);
 
