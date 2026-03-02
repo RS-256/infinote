@@ -31,25 +31,25 @@ public class InfinoteConfig {
     public static Map<String, BlockSoundConfig> BLOCK_SOUNDS = new HashMap<>();
     public static final Map<String, BlockSoundConfigCompiled> BLOCK_SOUNDS_COMPILED = new HashMap<>();
 
-    public static void load() {
-        Path configDir = FabricLoader.getInstance().getConfigDir();
-        Path path = configDir.resolve("infinote.json");
-        Path backupPath = configDir.resolve("infinote_old.json");
+    public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir();
+    public  static final Path CONFIG_PATH = CONFIG_DIR.resolve("infinote.json");
 
-        Infinote.LOGGER.info("Infinote config path = {}", path.toAbsolutePath());
+    public static void load() {
+
+        Infinote.LOGGER.info("Infinote config path = {}", CONFIG_PATH.toAbsolutePath());
 
         try {
-            if (Files.notExists(path)) {
+            if (Files.notExists(CONFIG_PATH)) {
                 Infinote.LOGGER.info("could not found config. generating default...");
 
-                createDefault(path);
+                createDefault();
                 rebuildCache();
                 return;
             } else {
                 Infinote.LOGGER.info("Config found!");
             }
 
-            Reader reader = Files.newBufferedReader(path);
+            Reader reader = Files.newBufferedReader(CONFIG_PATH);
             Type type = new TypeToken<Map<String, BlockSoundConfig>>(){}.getType();
             BLOCK_SOUNDS = GSON.fromJson(reader, type);
             reader.close();
@@ -63,11 +63,11 @@ public class InfinoteConfig {
             Infinote.LOGGER.warn("Config corrupted, backing up...");
 
             try {
-                if (Files.exists(path)) {
-                    Files.move(path, backupPath, StandardCopyOption.REPLACE_EXISTING);
+                if (Files.exists(CONFIG_PATH)) {
+                    createBackup(CONFIG_PATH);
                 }
 
-                createDefault(path);
+                createDefault();
 
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -75,7 +75,17 @@ public class InfinoteConfig {
         }
     }
 
-    private static void createDefault(Path path) throws IOException {
+    public static void createBackup(Path path) throws IOException {
+        String ts = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        Path backupPath = CONFIG_DIR.resolve("infinote_old_" + ts + ".json");
+        try {
+            Files.move(path, backupPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    private static void createDefault() throws IOException {
         Map<String, BlockSoundConfig> defaultMap = new HashMap<>();
 
         String defaultBlockId = "minecraft:air";
@@ -87,10 +97,11 @@ public class InfinoteConfig {
 
         defaultMap.put(defaultBlockId, defaultConfig);
 
-        try (Writer writer = Files.newBufferedWriter(path)) {
+        try (Writer writer = Files.newBufferedWriter(CONFIG_PATH)) {
             GSON.toJson(defaultMap, writer);
         }
     }
+
     public static void save() {
         Path path = FabricLoader.getInstance()
                 .getConfigDir()

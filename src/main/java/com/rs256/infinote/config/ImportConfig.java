@@ -9,15 +9,13 @@ import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.rs256.infinote.config.InfinoteConfig.BLOCK_SOUNDS;
+import static com.rs256.infinote.config.InfinoteConfig.*;
 import static net.minecraft.sounds.SoundSource.RECORDS;
 
 public class ImportConfig {
@@ -86,22 +84,13 @@ public class ImportConfig {
             return 0;
         }
 
-        Path infinoteJson = configDir.resolve("infinote.json");
-        Path backupJson = configDir.resolve("infinote_old.json");
-
         try {
-            if (Files.exists(infinoteJson)) {
-                try {
-                    Files.move(infinoteJson, backupJson,
-                            StandardCopyOption.REPLACE_EXISTING,
-                            StandardCopyOption.ATOMIC_MOVE);
-                } catch (AtomicMoveNotSupportedException ignore) {
-                    Files.move(infinoteJson, backupJson, StandardCopyOption.REPLACE_EXISTING);
-                }
+            if (Files.exists(CONFIG_PATH)) {
+                createBackup(CONFIG_PATH);
             }
 
             Gson gsonPretty = new GsonBuilder().setPrettyPrinting().create();
-            try (Writer w = Files.newBufferedWriter(infinoteJson)) {
+            try (Writer w = Files.newBufferedWriter(CONFIG_PATH)) {
                 gsonPretty.toJson(imported, w);
             }
 
