@@ -103,11 +103,7 @@ public class InfinoteConfig {
     }
 
     public static void save() {
-        Path path = FabricLoader.getInstance()
-                .getConfigDir()
-                .resolve("infinote.json");
-
-        try (Writer writer = Files.newBufferedWriter(path)) {
+        try (Writer writer = Files.newBufferedWriter(CONFIG_PATH)) {
             GSON.toJson(BLOCK_SOUNDS, writer);
             Infinote.LOGGER.info("Config saved successfully.");
         } catch (Exception e) {
