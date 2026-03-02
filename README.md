@@ -281,6 +281,18 @@ Attribution is required.
 
 ---
 
+## TODO
+
+```
+[ ] config schem-version
+[ ] /infinote list <page> <pageSize>
+[ ] /infinote get <block>
+[ ] load report
+[ ] timestamp backup
+```
+
+---
+
 # Stonecutter Fabric template
 
 This mod uses Stonecutter template.
