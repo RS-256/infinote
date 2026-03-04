@@ -46,7 +46,7 @@ By using a **server-side resource pack**, all clients can hear the same custom s
 
 ## 📸 Demonstration
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/BJjdFrJX_SA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+https://youtu.be/BJjdFrJX_SA
 
 ---
 
