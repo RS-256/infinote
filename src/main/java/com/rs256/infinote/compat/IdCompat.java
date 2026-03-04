@@ -2,47 +2,32 @@ package com.rs256.infinote.compat;
 
 //? if <=1.21.10 {
 /*import net.minecraft.resources.ResourceLocation;
- *///?} else
+ *///?} else {
+import com.rs256.infinote.Infinote;
+//?}
 import net.minecraft.resources.Identifier;
 
 public final class IdCompat {
     private IdCompat() {
     }
 
-    // "path" → "minecraft:path" にする等、最低限の正規化
+    // "path" -> "minecraft:path" にする等、最低限の正規化 <- Identifierにあるので、いつかけす
     public static String normalize(String raw) {
         if (raw == null) return null;
         String s = raw.trim();
         if (s.isEmpty()) return null;
-        if (!s.contains(":")) s = "minecraft:" + s;
         return s;
     }
 
 
     //? if <=1.21.10 {
     /*public static ResourceLocation idFromString(String raw) {
-        String s = normalize(raw);
-        if (s == null) return null;
-
-        int i = s.indexOf(':');
-        if (i <= 0 || i >= s.length() - 1) return null;
-
-        String namespace = s.substring(0, i);
-        String path = s.substring(i + 1);
-        return idFromNamespaceAndPath(namespace, path);
+        return ResourceLocation.tryParse(raw);
     }
 
     *///?} else {
     public static Identifier idFromString(String raw) {
-        String s = normalize(raw);
-        if (s == null) return null;
-
-        int i = s.indexOf(':');
-        if (i <= 0 || i >= s.length() - 1) return null;
-
-        String namespace = s.substring(0, i);
-        String path = s.substring(i + 1);
-        return idFromNamespaceAndPath(namespace, path);
+        return Identifier.tryParse(raw);
     }
     //?}
 

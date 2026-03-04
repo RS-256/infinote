@@ -243,9 +243,7 @@ public class InfinoteConfig {
         }
     }
 
-    /**
-     *  { "schema": N, "mappings": { ... } } のJsonObjectをビルド
-     */
+    /** { "schema": N, "mappings": { ... } } のJsonObjectをビルド */
     private static JsonObject buildJsonObject() {
         JsonObject root = new JsonObject();
         root.addProperty("schema", CURRENT_SCHEMA);
