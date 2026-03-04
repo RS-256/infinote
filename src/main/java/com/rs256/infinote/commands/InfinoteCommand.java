@@ -200,7 +200,11 @@ public class InfinoteCommand {
                             .append(Component.literal("[X] ")
                                     .withStyle(style -> style
                                             .withColor(ChatFormatting.RED)
+                                            //? if <=1.21.4 {
+                                            /*.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "infinote remove " + blockId))))
+                                            *///?} else {
                                             .withClickEvent(new ClickEvent.SuggestCommand("/infinote remove " + blockId))))
+                                            //?}
                             .append(blockId)
                             .withStyle(ChatFormatting.AQUA)
                             .append(Component.literal(" -> ").withStyle(ChatFormatting.GRAY))
@@ -211,8 +215,13 @@ public class InfinoteCommand {
         Component prev = Component.literal("<<<  ")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
+                        //? if <=1.21.4 {
+                        /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/infinote list " + (p - 1) + " " + pageSize))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to page " + (p - 1)))));
+                         *///?} else {
                         .withClickEvent(new ClickEvent.RunCommand("/infinote list " + (p - 1) + " " + pageSize))
                         .withHoverEvent(new HoverEvent.ShowText(Component.literal("Go to page " + (p - 1)))));
+                        //?}
 
         Component center = Component.literal(
                 " " + total + " entries  |  page " + p + "/" + totalPages + "  (" + pageSize + "/page)"
@@ -221,8 +230,13 @@ public class InfinoteCommand {
         Component next = Component.literal("  >>>")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
+                        //? if <=1.21.4 {
+                        /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/infinote list " + (p + 1) + " " + pageSize))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to page " + (p + 1)))));
+                         *///?} else {
                         .withClickEvent(new ClickEvent.RunCommand("/infinote list " + (p + 1) + " " + pageSize))
                         .withHoverEvent(new HoverEvent.ShowText(Component.literal("Go to page " + (p + 1)))));
+                        //?}
 
         MutableComponent footer = Component.empty();
         footer.append(p > 1 ? prev : Component.literal("<<< ").withStyle(ChatFormatting.DARK_GRAY));

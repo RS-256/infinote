@@ -136,7 +136,7 @@ tasks.named<AbstractArchiveTask>("remapJar") {
 }
 
 tasks.named<AbstractArchiveTask>("sourcesJar") {
-    // infinote-v0.1.0-mc1.21.11.jar
+    // infinote-v0.1.0-mc1.21.11-source.jar
     archiveFileName.set(
         "${project.property("mod.id")}-v${project.property("mod.version")}-mc${mcVersion}-source.jar"
     )
