@@ -98,7 +98,26 @@ and converts it into Infinote format.
 
 This command allows easy migration from NotebetterFabric to Infinote.
 
----
+```
+/infinote list [<page>] [<pageSize>]
+```
+
+Lists entries currently stored in the configuration.
+
+- `[<page>]` (optional): Page number to display, default is 1.
+- `[<pageSize>]` (optional): Number of entries per page, default is 16.
+
+If not specified, default values are used.
+
+```
+/infinote get <block>
+```
+
+Searches the configuration for a specific block entry.
+
+- `<block>`: Target block id (e.g. minecraft:stone)
+
+Displays the sound mapping assigned to the block if exists.
 
 ### 🎵 About `pitchShift`
 
