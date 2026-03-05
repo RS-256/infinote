@@ -1,6 +1,7 @@
 package com.rs256.infinote.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.rs256.infinote.compat.CommandCompat;
 import com.rs256.infinote.compat.IdCompat;
 import com.rs256.infinote.config.ImportConfig;
 import com.rs256.infinote.config.InfinoteConfig;
@@ -10,18 +11,9 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.*;
-//? if <=1.21.10 {
-/*import net.minecraft.commands.arguments.ResourceLocationArgument;
- *///?} else {
-import net.minecraft.commands.arguments.IdentifierArgument;
-//?}
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.sounds.SoundSource;
 
 import java.util.ArrayList;
@@ -35,16 +27,8 @@ public class InfinoteCommand {
                 Commands.literal("infinote")
                         .then(Commands.literal("add")
                                 .then(Commands.argument("block", BlockStateArgument.block(registryAccess))
-                                        //? if <=1.21.10 {
-                                        /*.then(Commands.argument("sound", ResourceLocationArgument.id())
-                                         *///?} else {
-                                        .then(Commands.argument("sound", IdentifierArgument.id())
-                                                //?}
-                                                //? if <=1.21.5 {
-                                                /*.suggests(SuggestionProviders.AVAILABLE_SOUNDS)
-                                                 *///?} else {
-                                                .suggests(SuggestionProviders.cast(SuggestionProviders.AVAILABLE_SOUNDS))
-                                                //?}
+                                        .then(IdCompat.commandArgument("sound")
+                                                .suggests(CommandCompat.soundSuggestionProviders())
                                                 .then(Commands.argument("category", StringArgumentType.word())
                                                         .suggests((commandContext, builder) -> {
                                                             for (SoundSource cat : SoundSource.values()) {
@@ -56,11 +40,7 @@ public class InfinoteCommand {
                                                                 .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
                                                                         .executes(commandContext -> {
                                                                             String blockId = BuiltInRegistries.BLOCK.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock()).toString();
-                                                                            //? if <=1.21.10 {
-                                                                            /*String soundId = IdCompat.normalize(ResourceLocationArgument.getId(commandContext, "sound").toString());
-                                                                             *///?} else {
-                                                                            String soundId = IdCompat.normalize(IdentifierArgument.getId(commandContext, "sound").toString());
-                                                                            //?}
+                                                                            String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
                                                                             String rawCategory = StringArgumentType.getString(commandContext, "category");
                                                                             float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
                                                                             float volume = FloatArgumentType.getFloat(commandContext, "volume");
@@ -200,11 +180,7 @@ public class InfinoteCommand {
                             .append(Component.literal("[X] ")
                                     .withStyle(style -> style
                                             .withColor(ChatFormatting.RED)
-                                            //? if <=1.21.4 {
-                                            /*.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "infinote remove " + blockId))))
-                                            *///?} else {
-                                            .withClickEvent(new ClickEvent.SuggestCommand("/infinote remove " + blockId))))
-                                            //?}
+                                            .withClickEvent(CommandCompat.clickSuggestCommand("/infinote remove " + blockId))))
                             .append(blockId)
                             .withStyle(ChatFormatting.AQUA)
                             .append(Component.literal(" -> ").withStyle(ChatFormatting.GRAY))
@@ -215,13 +191,8 @@ public class InfinoteCommand {
         Component prev = Component.literal("<<<  ")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
-                        //? if <=1.21.4 {
-                        /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/infinote list " + (p - 1) + " " + pageSize))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to page " + (p - 1)))));
-                         *///?} else {
-                        .withClickEvent(new ClickEvent.RunCommand("/infinote list " + (p - 1) + " " + pageSize))
-                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Go to page " + (p - 1)))));
-                        //?}
+                        .withClickEvent(CommandCompat.clickRunCommand("/infinote list " + (p - 1) + " " + pageSize))
+                        .withHoverEvent(CommandCompat.hoverShowText(Component.literal("Go to page " + (p - 1)))));
 
         Component center = Component.literal(
                 " " + total + " entries  |  page " + p + "/" + totalPages + "  (" + pageSize + "/page)"
@@ -230,18 +201,13 @@ public class InfinoteCommand {
         Component next = Component.literal("  >>>")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
-                        //? if <=1.21.4 {
-                        /*.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/infinote list " + (p + 1) + " " + pageSize))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Go to page " + (p + 1)))));
-                         *///?} else {
-                        .withClickEvent(new ClickEvent.RunCommand("/infinote list " + (p + 1) + " " + pageSize))
-                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Go to page " + (p + 1)))));
-                        //?}
+                        .withClickEvent(CommandCompat.clickRunCommand("/infinote list " + (p + 1) + " " + pageSize))
+                        .withHoverEvent(CommandCompat.hoverShowText(Component.literal("Go to page " + (p + 1)))));
 
         MutableComponent footer = Component.empty();
-        footer.append(p > 1 ? prev : Component.literal("<<< ").withStyle(ChatFormatting.DARK_GRAY));
+        footer.append(p > 1 ? prev : Component.literal("<<<  ").withStyle(ChatFormatting.DARK_GRAY));
         footer.append(center);
-        footer.append(p < totalPages ? next : Component.literal(" >>>").withStyle(ChatFormatting.DARK_GRAY));
+        footer.append(p < totalPages ? next : Component.literal("  >>>").withStyle(ChatFormatting.DARK_GRAY));
 
         source.sendSuccess(() -> records, false);
         source.sendSuccess(() -> footer, false);
@@ -261,11 +227,15 @@ public class InfinoteCommand {
             return 0;
         }
 
-        source.sendSuccess(() -> Component.literal("Infinote mapping for " + key + ":"), false);
-        source.sendSuccess(() -> Component.literal("├─sound: " + config.sound), false);
-        source.sendSuccess(() -> Component.literal("├─category: " + config.category), false);
-        source.sendSuccess(() -> Component.literal("├─pitchShift: " + config.pitchShift), false);
-        source.sendSuccess(() -> Component.literal("└─volume: " + config.volume), false);
+        Component text =Component.empty()
+                .append(Component.literal("Infinote mapping for ").withStyle(ChatFormatting.GOLD))
+                .append(Component.literal(key).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal("\n├─sound: ").withStyle(ChatFormatting.GRAY))      .append(Component.literal(config.sound).withStyle(ChatFormatting.GREEN))
+                .append(Component.literal("\n├─category: ").withStyle(ChatFormatting.GRAY))   .append(Component.literal(config.category.toString()).withStyle(ChatFormatting.LIGHT_PURPLE))
+                .append(Component.literal("\n├─pitchShift: ").withStyle(ChatFormatting.GRAY)) .append(Component.literal(String.valueOf(config.pitchShift)).withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal("\n└─volume: ").withStyle(ChatFormatting.GRAY))     .append(Component.literal(String.valueOf(config.volume)).withStyle(ChatFormatting.YELLOW));
+
+        source.sendSuccess(() -> text, false);
         return 1;
     }
 }

@@ -1,11 +1,16 @@
 package com.rs256.infinote.compat;
 
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 //? if <=1.21.10 {
-/*import net.minecraft.resources.ResourceLocation;
+/*import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.resources.ResourceLocation;
  *///?} else {
-import com.rs256.infinote.Infinote;
-//?}
+import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.resources.Identifier;
+//?}
 
 public final class IdCompat {
     private IdCompat() {
@@ -19,15 +24,29 @@ public final class IdCompat {
         return s;
     }
 
-
     //? if <=1.21.10 {
     /*public static ResourceLocation idFromString(String raw) {
         return ResourceLocation.tryParse(raw);
     }
 
+    public static RequiredArgumentBuilder<CommandSourceStack, ResourceLocation> commandArgument(String key) {
+        return Commands.argument(key, ResourceLocationArgument.id());
+    }
+
+    public static String iDArgumentGetIdString(CommandContext<CommandSourceStack> commandContext, String name) {
+        return ResourceLocationArgument.getId(commandContext, name).toString();
+    }
     *///?} else {
     public static Identifier idFromString(String raw) {
         return Identifier.tryParse(raw);
+    }
+
+    public static RequiredArgumentBuilder<CommandSourceStack, Identifier> commandArgument(String key) {
+        return Commands.argument(key, IdentifierArgument.id());
+    }
+
+    public static String iDArgumentGetIdString(CommandContext<CommandSourceStack> commandContext, String name) {
+        return IdentifierArgument.getId(commandContext, name).toString();
     }
     //?}
 
