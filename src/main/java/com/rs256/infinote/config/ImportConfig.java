@@ -33,8 +33,7 @@ public class ImportConfig {
     }
 
     public static int fromNotebetterfabric(String sourceFileName) {
-        Path configDir = FabricLoader.getInstance().getConfigDir();
-        Path source = configDir.resolve(sourceFileName);
+        Path source = CONFIG_DIR.resolve(sourceFileName);
 
         if (!Files.exists(source)) {
             Infinote.LOGGER.warn("Import file not found: {}", source);

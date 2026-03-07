@@ -117,7 +117,7 @@ public class InfinoteCommand {
         InfinoteConfig.add(blockId, soundId, category, pitchShift, volume);
 
         if (InfinoteConfig.isInConfig(blockId)) {
-            source.sendSuccess(() -> Component.literal("Added note for " + blockId + " with " + soundId), true);
+            CommandCompat.sourceSendSuccess(source, Component.literal("Added note for " + blockId + " with " + soundId), true);
         }
         return 1;
     }
@@ -131,14 +131,14 @@ public class InfinoteCommand {
         InfinoteConfig.remove(blockId);
 
         if (!InfinoteConfig.isInConfig(blockId)) {
-            source.sendSuccess(() -> Component.literal("Removed note for " + blockId), true);
+            CommandCompat.sourceSendSuccess(source, Component.literal("Removed note for " + blockId), true);
         }
         return 1;
     }
 
     private static int executeReload(CommandSourceStack source) {
         InfinoteConfig.load();
-        source.sendSuccess(() -> Component.literal("Infinote reloaded!"), true);
+        CommandCompat.sourceSendSuccess(source, Component.literal("Infinote reloaded!"), true);
         return 1;
     }
 
@@ -150,7 +150,7 @@ public class InfinoteCommand {
             ));
             return 0;
         }
-        source.sendSuccess(() -> Component.literal("Imported " + count + " mappings from " + fileName), true);
+        CommandCompat.sourceSendSuccess(source, Component.literal("Imported " + count + " mappings from " + fileName), true);
         return 1;
     }
 
@@ -160,7 +160,7 @@ public class InfinoteCommand {
 
         int total = keys.size();
         if (total == 0) {
-            source.sendSuccess(() -> Component.literal("You have no mappings."), false);
+            CommandCompat.sourceSendSuccess(source, Component.literal("You have no mappings."), false);
             return 1;
         }
 
@@ -209,8 +209,9 @@ public class InfinoteCommand {
         footer.append(center);
         footer.append(p < totalPages ? next : Component.literal("  >>>").withStyle(ChatFormatting.DARK_GRAY));
 
-        source.sendSuccess(() -> records, false);
-        source.sendSuccess(() -> footer, false);
+        Component list = records.append("\n").append(footer);
+
+        CommandCompat.sourceSendSuccess(source, list, false);
         return 1;
     }
 
@@ -227,7 +228,7 @@ public class InfinoteCommand {
             return 0;
         }
 
-        Component text =Component.empty()
+        Component component = Component.empty()
                 .append(Component.literal("Infinote mapping for ").withStyle(ChatFormatting.GOLD))
                 .append(Component.literal(key).withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("\n├─sound: ").withStyle(ChatFormatting.GRAY))      .append(Component.literal(config.sound).withStyle(ChatFormatting.GREEN))
@@ -235,7 +236,8 @@ public class InfinoteCommand {
                 .append(Component.literal("\n├─pitchShift: ").withStyle(ChatFormatting.GRAY)) .append(Component.literal(String.valueOf(config.pitchShift)).withStyle(ChatFormatting.YELLOW))
                 .append(Component.literal("\n└─volume: ").withStyle(ChatFormatting.GRAY))     .append(Component.literal(String.valueOf(config.volume)).withStyle(ChatFormatting.YELLOW));
 
-        source.sendSuccess(() -> text, false);
+        CommandCompat.sourceSendSuccess(source, component, false);
+
         return 1;
     }
 }

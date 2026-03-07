@@ -9,17 +9,17 @@ import net.minecraft.network.chat.HoverEvent;
 
 public class CommandCompat {
     //? if <=1.21.5 {
-    /*public static SuggestionProvider<CommandSourceStack> soundSuggestionProviders() {
+    public static SuggestionProvider<CommandSourceStack> soundSuggestionProviders() {
         return SuggestionProviders.AVAILABLE_SOUNDS;
     }
-     *///?} else {
-    public static SuggestionProvider<CommandSourceStack> soundSuggestionProviders() {
+     //?} else {
+    /*public static SuggestionProvider<CommandSourceStack> soundSuggestionProviders() {
         return SuggestionProviders.cast(SuggestionProviders.AVAILABLE_SOUNDS);
     }
-    //?}
+    *///?}
 
     //? if <=1.21.4 {
-    /*public static ClickEvent clickRunCommand(String string) {
+    public static ClickEvent clickRunCommand(String string) {
         return new ClickEvent(ClickEvent.Action.RUN_COMMAND, string);
     }
 
@@ -31,8 +31,8 @@ public class CommandCompat {
         return new HoverEvent(HoverEvent.Action.SHOW_TEXT, component);
     }
 
-     *///?} else {
-    public static ClickEvent.RunCommand clickRunCommand(String string) {
+     //?} else {
+    /*public static ClickEvent.RunCommand clickRunCommand(String string) {
         return new ClickEvent.RunCommand(string);
     }
 
@@ -43,5 +43,13 @@ public class CommandCompat {
     public static HoverEvent.ShowText hoverShowText(Component component) {
         return new HoverEvent.ShowText(component);
     }
-    //?}
+    *///?}
+
+    public static void sourceSendSuccess(CommandSourceStack commandSourceStack, Component component, boolean broadcast){
+        //? if <=1.19.4 {
+        commandSourceStack.sendSuccess(component, broadcast);
+         //?} else {
+        /*commandSourceStack.sendSuccess(() -> component, broadcast);
+        *///?}
+    }
 }

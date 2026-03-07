@@ -93,8 +93,7 @@ public class InfinoteConfig {
     }
 
     /**
-     * BLOCK_SOUNDS からコンパイル済みキャッシュを再構築する。
-     * 各エントリの検証結果を {@link LoadReport} にまとめて返す。
+     * BLOCK_SOUNDS からコンパイル済みキャッシュを再構築
      */
     public static LoadReport rebuildCache() {
         BLOCK_SOUNDS_COMPILED.clear();
