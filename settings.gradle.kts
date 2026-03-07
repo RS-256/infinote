@@ -45,4 +45,4 @@ stonecutter {
     }
 }
 
-rootProject.name = "root"
+rootProject.name = "infinote"
