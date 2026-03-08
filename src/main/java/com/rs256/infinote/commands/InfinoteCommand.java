@@ -3,6 +3,7 @@ package com.rs256.infinote.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.rs256.infinote.compat.CommandCompat;
 import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.compat.RegistryCompat;
 import com.rs256.infinote.config.ImportConfig;
 import com.rs256.infinote.config.InfinoteConfig;
 
@@ -12,7 +13,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.*;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
 import net.minecraft.sounds.SoundSource;
 
@@ -39,7 +39,7 @@ public class InfinoteCommand {
                                                         .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
                                                                 .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
                                                                         .executes(commandContext -> {
-                                                                            String blockId = BuiltInRegistries.BLOCK.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock()).toString();
+                                                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
                                                                             String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
                                                                             String rawCategory = StringArgumentType.getString(commandContext, "category");
                                                                             float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
@@ -61,7 +61,7 @@ public class InfinoteCommand {
                                             return builder.buildFuture();
                                         })
                                         .executes(commandContext -> {
-                                            String blockId = BuiltInRegistries.BLOCK.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock()).toString();
+                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
                                             return executeRemove(commandContext.getSource(), blockId);
                                         })
                                 )
@@ -95,9 +95,7 @@ public class InfinoteCommand {
                         .then(Commands.literal("get")
                                 .then(Commands.argument("block", BlockStateArgument.block(registryAccess))
                                         .executes(commandContext -> {
-                                            String blockId = BuiltInRegistries.BLOCK
-                                                    .getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock())
-                                                    .toString();
+                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
                                             return executeGet(commandContext.getSource(), blockId);
                                         })
                                 )

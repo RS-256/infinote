@@ -72,6 +72,11 @@ java {
     sourceCompatibility = requiredJava
 }
 
+val fabricApiKey =
+    if (sc.current.parsed <= "1.19.2") "fabric"
+    else "fabric-api"
+// 1.19.2, 3, 4もfabricでよかったが、なんとなく
+
 tasks {
     processResources {
         val props = mapOf(
@@ -79,7 +84,8 @@ tasks {
             "name" to project.property("mod.name"),
             "version" to project.property("mod.version"),
             "minecraft" to project.property("mod.mc_dep"),
-            "fabricAPI" to project.property("deps.fabric_api")
+            "fabricAPI" to project.property("deps.fabric_api"),
+            "fabricApiKey" to fabricApiKey
         )
 
         filesMatching("fabric.mod.json") { expand(props) }

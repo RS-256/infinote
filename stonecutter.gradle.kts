@@ -4,7 +4,7 @@ plugins {
     // id("me.modmuss50.mod-publish-plugin") version "1.0.+" apply false
 }
 
-stonecutter active "1.21.11"
+stonecutter active "1.19.3"
 
 /*
 // Make newer versions be published last
@@ -35,6 +35,7 @@ tasks.register("runServerCurrentVersion") {
 }
 
 val releaseVersions = listOf(
+    "1.19.2",
     "1.19.4",
     "1.20.6",
     "1.21.4",
