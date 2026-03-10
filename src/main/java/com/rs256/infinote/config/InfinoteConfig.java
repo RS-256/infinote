@@ -141,7 +141,11 @@ public class InfinoteConfig {
 
     private static Map<String, BlockSoundConfig> readConfigFile() throws IOException {
         try (Reader reader = Files.newBufferedReader(CONFIG_PATH)) {
+            //? if <=1.17.1 {
+            /*JsonElement root = new JsonParser().parse(reader);
+             *///?} else {
             JsonElement root = JsonParser.parseReader(reader);
+            //?}
             if (!root.isJsonObject()) {
                 throw new JsonParseException("Config root is not a JSON object.");
             }

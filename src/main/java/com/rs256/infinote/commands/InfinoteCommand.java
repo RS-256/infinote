@@ -23,7 +23,7 @@ import java.util.List;
 
 public class InfinoteCommand {
 //? if <=1.18.2 {
-/*    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    /*public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("infinote")
                         .then(Commands.literal("add")
