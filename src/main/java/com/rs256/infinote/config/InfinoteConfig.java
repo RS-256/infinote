@@ -7,9 +7,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.compat.JsonCompat;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.sounds.SoundSource;
 
@@ -141,11 +141,8 @@ public class InfinoteConfig {
 
     private static Map<String, BlockSoundConfig> readConfigFile() throws IOException {
         try (Reader reader = Files.newBufferedReader(CONFIG_PATH)) {
-            //? if <=1.17.1 {
-            /*JsonElement root = new JsonParser().parse(reader);
-             *///?} else {
-            JsonElement root = JsonParser.parseReader(reader);
-            //?}
+            JsonElement root = JsonCompat.read(reader);
+
             if (!root.isJsonObject()) {
                 throw new JsonParseException("Config root is not a JSON object.");
             }
