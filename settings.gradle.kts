@@ -16,6 +16,9 @@ stonecutter {
     create(rootProject) {
         // See https://stonecutter.kikugie.dev/wiki/start/#choosing-minecraft-versions
         versions(
+            "1.18",
+            "1.18.1",
+            "1.18.2",
             "1.19",
             "1.19.1",
             "1.19.2",

@@ -35,6 +35,7 @@ tasks.register("runServerCurrentVersion") {
 }
 
 val releaseVersions = listOf(
+    "1.18.2",
     "1.19.2",
     "1.19.4",
     "1.20.6",

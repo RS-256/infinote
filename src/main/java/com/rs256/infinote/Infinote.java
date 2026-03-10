@@ -3,7 +3,11 @@ package com.rs256.infinote;
 import com.rs256.infinote.commands.InfinoteCommand;
 import com.rs256.infinote.config.InfinoteConfig;
 import net.fabricmc.api.ModInitializer;
+//? if <=1.18.2 {
+/*import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+ *///?} else {
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+//?}
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +34,13 @@ public class Infinote implements ModInitializer {
 		registerCommands();
 	}
 
+	//? if <=1.18.2 {
+	/*public void registerCommands() {
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> InfinoteCommand.register(dispatcher));
+	}
+	 *///?} else {
 	public void registerCommands() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> InfinoteCommand.register(dispatcher, registryAccess));
 	}
+	//?}
 }
