@@ -28,6 +28,8 @@ import static net.minecraft.sounds.SoundSource.RECORDS;
 public class InfinoteConfig {
 
     public static final int CURRENT_SCHEMA = 1;
+    public static final int DEFAULT_LIGHT_LEVEL = 0;
+    public static int lightLevel = DEFAULT_LIGHT_LEVEL;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static Map<String, BlockSoundConfig> BLOCK_SOUNDS = new HashMap<>();
@@ -47,11 +49,7 @@ public class InfinoteConfig {
         Infinote.LOGGER.info("Config found. Loading...");
 
         try {
-            Map<String, BlockSoundConfig> loaded = readConfigFile();
-            if (loaded == null) {
-                throw new JsonParseException("Config parsed as null.");
-            }
-            BLOCK_SOUNDS = loaded;
+            readConfigFile();
             LoadReport report = rebuildCache();
             Infinote.LOGGER.info("Config: {} entries, compiled {}, badBlock {}, badSound {}, badCat {}",
                     report.rawTotal(), report.compiledOk(), report.invalidBlockId(), report.invalidSoundId(), report.invalidCategory());
@@ -139,7 +137,7 @@ public class InfinoteConfig {
         return new LoadReport(BLOCK_SOUNDS.size(), compiledOk, invalidBlockId, invalidSoundId, invalidCategory);
     }
 
-    private static Map<String, BlockSoundConfig> readConfigFile() throws IOException {
+    private static void readConfigFile() throws IOException {
         try (Reader reader = Files.newBufferedReader(CONFIG_PATH)) {
             JsonElement root = JsonCompat.read(reader);
 
@@ -160,14 +158,13 @@ public class InfinoteConfig {
             if (schema < CURRENT_SCHEMA) {
                 Infinote.LOGGER.warn("Config schema {} is outdated (current: {}). Migrating...", schema, CURRENT_SCHEMA);
                 rootObject = migrateToCurrentSchema(schema, rootObject);
+                applyCurrentFormat(rootObject);
                 // マイグレーション後の内容を即保存
-                BLOCK_SOUNDS = parseCurrentFormat(rootObject);
                 save();
-                return BLOCK_SOUNDS;
+                return;
             }
-
             // schema == CURRENT_SCHEMA
-            return parseCurrentFormat(rootObject);
+            applyCurrentFormat(rootObject);
         }
     }
 
@@ -193,18 +190,24 @@ public class InfinoteConfig {
                 migrated.add("mappings", rootObject);
                 yield migrated;
             }
-            // case 1 -> { /* schema 1 -> 2 */ }
+            // case 2 -> { schema 2 -> 3 }
             default -> throw new JsonParseException("No migration step defined from schema " + from + ".");
         };
     }
 
     /** schema: 1 の現行フォーマットをパースする */
-    private static Map<String, BlockSoundConfig> parseCurrentFormat(JsonObject rootObj) {
-        if (!rootObj.has("mappings")) {
+    private static void applyCurrentFormat(JsonObject rootObject) {
+        // mappings
+        if (!rootObject.has("mappings")) {
             throw new JsonParseException("schema 1: missing 'mappings' field.");
         }
-        Type type = new TypeToken<Map<String, BlockSoundConfig>>() {}.getType();
-        return GSON.fromJson(rootObj.get("mappings"), type);
+        Type type = new TypeToken<Map<String, BlockSoundConfig>>() {
+        }.getType();
+        Map<String, BlockSoundConfig> parsed = GSON.fromJson(rootObject.get("mappings"), type);
+        if (parsed == null) {
+            throw new JsonParseException("schema 1: 'mappings' could not be parsed.");
+        }
+        BLOCK_SOUNDS = parsed;
     }
 
     private static void generateDefaultConfig() {

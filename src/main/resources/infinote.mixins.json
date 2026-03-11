@@ -1,15 +1,15 @@
 {
-	"required": true,
-	"package": "com.rs256.infinote.mixin",
-	"refmap": "${refmap}",
-	"compatibilityLevel": "${java}",
-	"mixins": [
-		"NoteBlockMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+  "required": true,
+  "package": "com.rs256.infinote.mixin",
+  "refmap": "${refmap}",
+  "compatibilityLevel": "${java}",
+  "mixins": [
+    "NoteBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }

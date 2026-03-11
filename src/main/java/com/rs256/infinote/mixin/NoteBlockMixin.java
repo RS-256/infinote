@@ -99,6 +99,10 @@ public abstract class NoteBlockMixin {
 //?}
 
     private static void playNote(Level level, BlockPos blockPos, SoundEvent soundEvent, BlockSoundConfigCompiled config, int note) {
+        if (!level.getBlockState(blockPos.above(1)).isAir()) {
+            return;
+        }
+
         float shiftedNote = note + config.pitchShift;
         float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
         ServerLevel serverLevel = (ServerLevel) level;
