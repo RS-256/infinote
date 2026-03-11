@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static net.minecraft.sounds.SoundSource.RECORDS;
 
