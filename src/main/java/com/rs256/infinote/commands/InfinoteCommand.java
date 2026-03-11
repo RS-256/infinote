@@ -5,6 +5,7 @@ import com.rs256.infinote.compat.ComponentCompat;
 import com.rs256.infinote.compat.CommandCompat;
 import com.rs256.infinote.compat.IdCompat;
 import com.rs256.infinote.compat.RegistryCompat;
+import com.rs256.infinote.config.BlockSoundConfigCompiled;
 import com.rs256.infinote.config.ImportConfig;
 import com.rs256.infinote.config.InfinoteConfig;
 
@@ -251,7 +252,7 @@ public class InfinoteCommand {
         MutableComponent records = ComponentCompat.empty();
         for (int i = from; i < to; i++) {
             String blockId = keys.get(i);
-            var config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(blockId);
+            BlockSoundConfigCompiled config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(blockId);
             if (config == null) continue;
 
             records.append(
@@ -301,7 +302,7 @@ public class InfinoteCommand {
             return 0;
         }
 
-        var config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(key);
+        BlockSoundConfigCompiled config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(key);
         if (config == null) {
             source.sendFailure(ComponentCompat.literal("No mapping for " + key));
             return 0;

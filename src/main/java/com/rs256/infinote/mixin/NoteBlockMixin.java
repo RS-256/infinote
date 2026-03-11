@@ -34,14 +34,12 @@ public abstract class NoteBlockMixin {
         BlockSoundConfigCompiled config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(belowBlock);
 
         if (config != null) {
-            var soundId = IdCompat.idFromString(config.sound);
-
-            if (soundId == null) {
+            if (IdCompat.idFromString(config.sound) == null) {
                 LOGGER.warn("cant cast!: {}, ignored", config.sound);
                 return;
             }
 
-            SoundEvent soundEvent = new SoundEvent(soundId);
+            SoundEvent soundEvent = new SoundEvent(IdCompat.idFromString(config.sound));
 
             playNote(level, blockPos, soundEvent, config, note);
 

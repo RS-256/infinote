@@ -22,14 +22,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static net.minecraft.sounds.SoundSource.RECORDS;
 
 public class InfinoteConfig {
 
     public static final int CURRENT_SCHEMA = 1;
-    public static final int DEFAULT_LIGHT_LEVEL = 0;
-    public static int lightLevel = DEFAULT_LIGHT_LEVEL;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static Map<String, BlockSoundConfig> BLOCK_SOUNDS = new HashMap<>();
@@ -101,7 +100,7 @@ public class InfinoteConfig {
         int invalidSoundId = 0;
         int invalidCategory = 0;
 
-        for (var entry : BLOCK_SOUNDS.entrySet()) {
+        for (Map.Entry<String, BlockSoundConfig> entry : BLOCK_SOUNDS.entrySet()) {
             String rawBlockKey = entry.getKey();
             BlockSoundConfig config = entry.getValue();
             if (config == null) {
@@ -182,17 +181,16 @@ public class InfinoteConfig {
     }
 
     private static JsonObject applyMigrationStep(int from, JsonObject rootObject) {
-        return switch (from) {
-            case 0 -> {
-                // schemaなし (old) -> schema 1
-                JsonObject migrated = new JsonObject();
-                migrated.addProperty("schema", 1);
-                migrated.add("mappings", rootObject);
-                yield migrated;
-            }
-            // case 2 -> { schema 2 -> 3 }
-            default -> throw new JsonParseException("No migration step defined from schema " + from + ".");
-        };
+        if (from == 0) {
+            // schema なし -> 1: ルート直下のマッピングをmappingsに
+            JsonObject migrated = new JsonObject();
+            migrated.addProperty("schema", 1);
+            migrated.add("mappings", rootObject);
+            return migrated;
+        } else {
+            // schema 1 -> 2; light_level?
+            throw new JsonParseException("No migration step defined from schema " + from + ".");
+        }
     }
 
     /** schema: 1 の現行フォーマットをパースする */
