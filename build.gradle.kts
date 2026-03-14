@@ -1,8 +1,32 @@
 plugins {
     id("net.fabricmc.fabric-loom-remap")
-
     // `maven-publish`
-    // id("me.modmuss50.mod-publish-plugin")
+    id("me.modmuss50.mod-publish-plugin")
+}
+
+publishMods {
+    file        = tasks.remapJar.flatMap { it.archiveFile }
+    additionalFiles.from(tasks.remapSourcesJar.flatMap { it.archiveFile })
+    displayName = "${property("mod.name")} v${property("mod.version")} for mc${property("mod.mc_title")}"
+    version     = "v${property("mod.version")}-mc${sc.current.version}"
+    changelog   = rootProject.file("CHANGELOG.md").readText()
+    type        = STABLE
+    modLoaders.add("fabric")
+
+
+
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
+
+    modrinth {
+        projectId   = property("publish.modrinth") as String
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.addAll(property("mod.mc_targets").toString().split(' '))
+        requires { slug = "fabric-api" }
+    }
+}
+
+tasks.named("publishModrinth") {
+    dependsOn("remapJar")
 }
 
 version = "${property("mod.version")}+${sc.current.version}"
@@ -127,19 +151,17 @@ tasks {
     }
 }
 
-val mcVersion = sc.current.version
-
 tasks.named<AbstractArchiveTask>("remapJar") {
     // infinote-v0.1.0-mc1.21.11.jar
     archiveFileName.set(
-        "${project.property("mod.id")}-v${project.property("mod.version")}-mc${mcVersion}.jar"
+        "${project.property("mod.id")}-v${project.property("mod.version")}-mc${sc.current.version}.jar"
     )
 }
 
 tasks.named<AbstractArchiveTask>("sourcesJar") {
     // infinote-v0.1.0-mc1.21.11-source.jar
     archiveFileName.set(
-        "${project.property("mod.id")}-v${project.property("mod.version")}-mc${mcVersion}-source.jar"
+        "${project.property("mod.id")}-v${project.property("mod.version")}-mc${sc.current.version}-source.jar"
     )
 }
 
