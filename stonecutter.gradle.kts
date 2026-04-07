@@ -42,7 +42,8 @@ val releaseVersions = listOf(
     "1.21.4",
     "1.21.5",
     "1.21.9",
-    "1.21.11"
+    "1.21.11",
+    "26.1.1"
 )
 
 tasks.register("buildReleaseRemapped") {
