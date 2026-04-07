@@ -45,10 +45,10 @@ val releaseVersions = listOf(
     "1.21.11"
 )
 
-tasks.register("buildReleaseRemap") {
+tasks.register("buildReleaseRemapped") {
     group = "build"
     description = "Build remapped jars only for release representative versions."
-    dependsOn(releaseVersions.map { v -> ":$v:buildAndCollectRemap" })
+    dependsOn(releaseVersions.map { v -> ":$v:buildAndCollectRemapped" })
 }
 
 tasks.register("publishAllToModrinthRelease") {

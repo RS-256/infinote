@@ -1,7 +1,6 @@
 {
   "required": true,
   "package": "com.rs256.infinote.mixin",
-  "refmap": "${refmap}",
   "compatibilityLevel": "${java}",
   "mixins": [
     "NoteBlockMixin"

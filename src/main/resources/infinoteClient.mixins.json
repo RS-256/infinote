@@ -1,7 +1,6 @@
 {
   "required": true,
   "package": "com.rs256.infinote.client.mixin",
-  "refmap": "${refmap}",
   "compatibilityLevel": "${java}",
   "client": [
     "SoundEngineMixin"

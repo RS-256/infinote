@@ -51,7 +51,11 @@ stonecutter {
             "1.21.9",
             "1.21.10",
             "1.21.11"
-        )
+        ).buildscript("build.obfuscated.gradle.kts")
+        //versions(
+        //    "26.1"
+        //).buildscript("build.unobfuscated.gradle.kts")
+
         vcsVersion = "1.21.11"
     }
 }
