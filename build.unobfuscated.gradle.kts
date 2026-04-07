@@ -167,13 +167,13 @@ publishMods {
     file           = tasks.jar.flatMap { it.archiveFile }
     //additionalFiles.from(tasks.sourcesJar.flatMap { it.archiveFile })
     displayName    = "${property("mod.name")} v${property("mod.version")} for mc${property("mod.mc_title")}"
-    version        = "v${property("mod.version")} as String"
+    version        = "v${property("mod.version")}-mc${sc.current.version}"
     changelog      = rootProject.file("CHANGELOG.md").readText()
     type           = STABLE
     modLoaders.add("fabric")
 
     dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
-        || providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null
+//        || providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null
 
 // Strongly recommend that you save the token in your PC’s environment variables.
 
