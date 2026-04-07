@@ -303,11 +303,12 @@ Attribution is required.
 ## TODO
 
 ```
-[ ] config schem-version
-[ ] /infinote list <page> <pageSize>
-[ ] /infinote get <block>
-[ ] load report
-[ ] timestamp backup
+[✓] config schem-version
+[✓] /infinote list <page> <pageSize>
+[✓] /infinote get <block>
+[✓] load report
+[✓] timestamp backup
+[ ] /infinote transpose <pitchShift> <force?>
 ```
 
 ---
