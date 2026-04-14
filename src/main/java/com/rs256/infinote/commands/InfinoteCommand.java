@@ -12,15 +12,19 @@ import com.rs256.infinote.config.InfinoteConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.rs256.infinote.transpose.TransposeUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.*;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
 import net.minecraft.sounds.SoundSource;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class InfinoteCommand {
 //? if <=1.18.2 {
@@ -102,6 +106,22 @@ public class InfinoteCommand {
                                         })
                                 )
                         )
+                        .then(Commands.literal("transpose")
+                                .then(Commands.argument("from", BlockPosArgument.blockPos())
+                                        .then(Commands.argument("to", BlockPosArgument.blockPos())
+                                                .then(Commands.argument("pitchTransposer", IntegerArgumentType.integer())
+                                                        .executes(
+                                                                context -> {
+                                                                    BlockPos from = CommandCompat.getBlockPos(context, "from");
+                                                                    BlockPos to = CommandCompat.getBlockPos(context, "to");
+                                                                    int  pitchShifter = IntegerArgumentType.getInteger(context, "pitchTransposer");
+                                                                    return executeTranspose(context.getSource(), from, to , pitchShifter);
+                                                                }
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
         );
     }
 *///?} else {
@@ -181,6 +201,22 @@ public class InfinoteCommand {
                                             String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
                                             return executeGet(commandContext.getSource(), blockId);
                                         })
+                                )
+                        )
+                        .then(Commands.literal("transpose")
+                                .then(Commands.argument("from", BlockPosArgument.blockPos())
+                                        .then(Commands.argument("to", BlockPosArgument.blockPos())
+                                                .then(Commands.argument("pitchTransposer", IntegerArgumentType.integer())
+                                                        .executes(
+                                                                context -> {
+                                                                    BlockPos from = CommandCompat.getBlockPos(context, "from");
+                                                                    BlockPos to = CommandCompat.getBlockPos(context, "to");
+                                                                    int  pitchShifter = IntegerArgumentType.getInteger(context, "pitchTransposer");
+                                                                    return executeTranspose(context.getSource(), from, to , pitchShifter);
+                                                                }
+                                                        )
+                                                )
+                                        )
                                 )
                         )
         );
@@ -318,6 +354,14 @@ public class InfinoteCommand {
 
         CommandCompat.sourceSendSuccess(source, component, false);
 
+        return 1;
+    }
+
+    private static int executeTranspose(CommandSourceStack source, BlockPos from, BlockPos to, int pitchTransposer) {
+        Map<String, Map<String, Float>> cache = TransposeUtil.buildTransposeCache();
+        MutableComponent result = TransposeUtil.transposeBlocks(source.getLevel(), from, to, pitchTransposer, cache);
+
+        CommandCompat.sourceSendSuccess(source, result, false);
         return 1;
     }
 }
