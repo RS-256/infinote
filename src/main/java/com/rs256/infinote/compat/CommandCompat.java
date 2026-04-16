@@ -29,5 +29,6 @@ public class CommandCompat {
 
     public static BlockPos getBlockPos(CommandContext<CommandSourceStack> commandContext, String string) {
         return commandContext.getArgument(string, Coordinates.class).getBlockPos(commandContext.getSource());
+        //return BlockPosArgument.getBlockPos(commandContext, string);
     }
 }

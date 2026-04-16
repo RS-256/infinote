@@ -6,6 +6,7 @@ import com.rs256.infinote.compat.IdCompat;
 import com.rs256.infinote.compat.RegistryCompat;
 import com.rs256.infinote.config.BlockSoundConfigCompiled;
 import com.rs256.infinote.config.InfinoteConfig;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.Level;
@@ -44,8 +45,6 @@ public final class TransposeUtil {
 
     public static MutableComponent transposeBlocks(Level level, BlockPos from, BlockPos to, int k, Map<String, Map<String, Float>> cache) {
 
-
-
         int minX = Math.min(from.getX(), to.getX());
         int minY = Math.min(from.getY(), to.getY());
         int minZ = Math.min(from.getZ(), to.getZ());
@@ -83,10 +82,12 @@ public final class TransposeUtil {
 
         Infinote.LOGGER.info("transposeArea finished: changed={}, noMapping={}, noCandidates={}", changed, noMapping, noCandidates);
 
-        return ComponentCompat.literal(
-                "Transpose result: changed = " + changed +
-                        ", skipped(no mapping) = " + noMapping +
-                        ", skipped(no candidates) = " + noCandidates
+        return ComponentCompat.buildWithBreak(
+                ComponentCompat.literal("Transpose result").withStyle(ChatFormatting.GOLD),
+                ComponentCompat.literal("transposed: ")
+                        .append(ComponentCompat.literal(String.valueOf(changed)).withStyle(ChatFormatting.GREEN)),
+                ComponentCompat.literal("no mapping: ")
+                        .append(ComponentCompat.literal(String.valueOf(noMapping)).withStyle(ChatFormatting.YELLOW))
         );
     }
 
@@ -97,6 +98,12 @@ public final class TransposeUtil {
         }
 
         int currentNote = state.getValue(NoteBlock.NOTE);
+        int targetNote = currentNote + k;
+
+        if (0 <= targetNote && targetNote <= 24) {
+            level.getBlockState(pos).setValue(NoteBlock.NOTE, targetNote);
+            return "changed";
+        }
 
         BlockPos belowPos = pos.below();
         String belowBlockId = RegistryCompat.getKey(level.getBlockState(belowPos).getBlock());
@@ -158,8 +165,7 @@ public final class TransposeUtil {
             return "no_candidates";
         }
 
-        BlockState newNoteState = state.setValue(NoteBlock.NOTE, bestNote);
-        level.setBlock(pos, newNoteState, 3);
+        level.getBlockState(pos).setValue(NoteBlock.NOTE, bestNote);
 
         var bestBlockIdObj = IdCompat.idFromString(bestBlockId);
         if (bestBlockIdObj == null) {

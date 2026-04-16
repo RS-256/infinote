@@ -6,8 +6,9 @@ public class ComponentCompat {
     public static MutableComponent literal(String string) {
     //? if <=1.18.2 {
     /*return new TextComponent(string);
-    *///?} else
+    *///?} else {
     return Component.literal(string);
+    //?}
 }
 
     public static MutableComponent empty() {
@@ -41,11 +42,14 @@ public class ComponentCompat {
     }
     //?}
 
-    public static MutableComponent build(MutableComponent mutableComponent, String[] strings) {
-        return null;
-    }
-
-    public static MutableComponent buildWithBreak(MutableComponent mutableComponent, String[] strings) {
-        return null;
+    public static MutableComponent buildWithBreak(MutableComponent... lines) {
+        MutableComponent out = empty();
+        for (int i = 0; i < lines.length; i++) {
+            out.append(lines[i]);
+            if (i + 1 < lines.length) {
+                out.append(literal("\n"));
+            }
+        }
+        return out;
     }
 }
