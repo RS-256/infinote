@@ -31,6 +31,6 @@
 	"depends": {
 		"fabricloader": "${fabricLoader}",
 		"minecraft": "${minecraft}",
-		"${fabricApiKey}": "*"
+		"${fabricApiKey}": "${fabricAPI}"
 	}
 }

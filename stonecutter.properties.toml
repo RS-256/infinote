@@ -5,6 +5,9 @@ mod.version = "1.4.1"
 mod.group   = "com.rs256"
 
 deps.fabric_loader = "0.18.6"
+build.fabric_loader = ">=0.18.6"
+
+build.fabric_api = "*"
 
 publish.modrinth   = "6FhIDpFC"
 publish.curseforge = "XXXXXXXX" #curseforge numeric ID

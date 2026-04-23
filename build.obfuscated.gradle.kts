@@ -97,8 +97,8 @@ tasks {
             "name"          to project.property("mod.name"),
             "version"       to project.property("mod.version"),
             "minecraft"     to project.property("mod.mc_dep"),
-            "fabricLoader"  to project.property("deps.fabric_loader"),
-            "fabricAPI"     to project.property("deps.fabric_api"),
+            "fabricLoader"  to project.property("build.fabric_loader"),
+            "fabricAPI"     to project.property("build.fabric_api"),
             "fabricApiKey"  to fabricApiKey,
             "accesswidener" to accesswidener
         )
