@@ -119,6 +119,21 @@ Searches the configuration for a specific block entry.
 
 Displays the sound mapping assigned to the block if exists.
 
+```
+/infinote transpose <from> <to> <pitchTransposer>
+```
+
+Transposes all Note Blocks in the selected cuboid area.
+
+- `<from>`: First corner of the target area
+- `<to>`: Opposite corner of the target area
+- `<pitchTransposer>`: Amount of semitone shift to apply to each Note Block
+
+When the target note stays inside vanilla Note Block range, the note value is shifted directly.
+If the target note goes out of range, Infinote attempts to preserve the same sound by switching the supporting block below the Note Block to another configured mapping with a compatible pitch shift.
+
+This makes it possible to transpose larger builds without manually rebuilding every mapping.
+
 ### 🎵 About `pitchShift`
 
 `pitchShift` represents pitch change in **semitones**.
@@ -308,7 +323,8 @@ Attribution is required.
 [✓] /infinote get <block>
 [✓] load report
 [✓] timestamp backup
-[ ] /infinote transpose <pitchShift> <force?>
+[✓] /infinote transpose <from> <to> <pitchTransposer>
+[ ] /bpm set <bpm> <tickPerQuarter>
 ```
 
 ---

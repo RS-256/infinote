@@ -95,6 +95,18 @@ and converts it into Infinote format.
 
 This command allows easy migration from NotebetterFabric to Infinote.
 
+```
+/infinote transpose <from> <to> <pitchTransposer>
+```
+
+Transposes all Note Blocks in the selected cuboid area.
+
+- `<from>`: First corner of the target area
+- `<to>`: Opposite corner of the target area
+- `<pitchTransposer>`: Amount of semitone shift to apply
+
+If a transpose would push a Note Block outside the vanilla range, Infinote attempts to keep the same mapped sound by choosing another configured supporting block with a compatible pitch shift.
+
 ---
 
 ### 🎵 About `pitchShift`
