@@ -51,6 +51,9 @@ https://youtu.be/BJjdFrJX_SA
 ---
 
 ## 🛠️ Usage
+If you are looking for a simple usage, an AI-powered wiki is a useful option. In most cases, just ask the AI a question and you will get an answer.
+
+https://deepwiki.com/RS-256/infinote
 
 <details>
 <summary><strong>Click to expand command usage</strong></summary>
