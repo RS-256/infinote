@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -71,7 +72,7 @@ public abstract class NoteBlockMixin {
         }
     }
     *///?} else {
-    private void infinote_onPlayNote(Entity entity, BlockState state, Level level, BlockPos blockPos, CallbackInfo ci) {
+    private void infinote$onPlayNote(Entity entity, BlockState state, Level level, BlockPos blockPos, CallbackInfo ci) {
         int note = state.getValue(NoteBlock.NOTE);
 
         BlockPos belowPos = blockPos.below(1);
@@ -96,6 +97,7 @@ public abstract class NoteBlockMixin {
     }
 //?}
 
+    @Unique
     private static void playNote(Level level, BlockPos blockPos, SoundEvent soundEvent, BlockSoundConfigCompiled config, int note) {
         if (!level.getBlockState(blockPos.above(1)).isAir()) {
             return;
