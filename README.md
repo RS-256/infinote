@@ -101,6 +101,8 @@ and converts it into Infinote format.
 
 This command allows easy migration from NotebetterFabric to Infinote.
 
+---
+
 ```
 /infinote list [<page>] [<pageSize>]
 ```
@@ -112,6 +114,8 @@ Lists entries currently stored in the configuration.
 
 If not specified, default values are used.
 
+---
+
 ```
 /infinote get <block>
 ```
@@ -121,6 +125,8 @@ Searches the configuration for a specific block entry.
 - `<block>`: Target block id (e.g. minecraft:stone)
 
 Displays the sound mapping assigned to the block if exists.
+
+---
 
 ```
 /infinote transpose <from> <to> <pitchTransposer>
@@ -136,6 +142,31 @@ When the target note stays inside vanilla Note Block range, the note value is sh
 If the target note goes out of range, Infinote attempts to preserve the same sound by switching the supporting block below the Note Block to another configured mapping with a compatible pitch shift.
 
 This makes it possible to transpose larger builds without manually rebuilding every mapping.
+
+---
+
+```
+/bpm set <bpm> <tickPerQuarter>
+```
+
+Sets the server tick rate from BPM.  
+This command calculates TPS with:
+
+```
+tps = bpm * tickPerQuarter / 60
+```
+
+Then it runs:
+
+```
+/tick rate <tps>
+```
+
+- `<bpm>`: Beats per minute
+- `<tickPerQuarter>`: Ticks per quarter note
+- Available on Minecraft versions with the vanilla `tick rate` command (mc1.20.3+)
+
+For example, `/bpm set 120 8` sets the tick rate to `16` TPS.
 
 ### 🎵 About `pitchShift`
 
@@ -327,7 +358,7 @@ Attribution is required.
 [✓] load report
 [✓] timestamp backup
 [✓] /infinote transpose <from> <to> <pitchTransposer>
-[ ] /bpm set <bpm> <tickPerQuarter>
+[✓] /bpm set <bpm> <tickPerQuarter>
 ```
 
 ---

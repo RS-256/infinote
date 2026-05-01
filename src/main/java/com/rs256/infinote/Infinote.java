@@ -1,6 +1,9 @@
 package com.rs256.infinote;
 
 import com.rs256.infinote.commands.InfinoteCommand;
+//? if >=1.20.3 {
+import com.rs256.infinote.commands.BpmCommand;
+//?}
 import com.rs256.infinote.config.InfinoteConfig;
 
 import net.fabricmc.api.ModInitializer;
@@ -51,7 +54,12 @@ public class Infinote implements ModInitializer {
 	}
 	 *///?} else {
 	public void registerCommands() {
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> InfinoteCommand.register(dispatcher, registryAccess));
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			InfinoteCommand.register(dispatcher, registryAccess);
+			//? if >=1.20.3 {
+			BpmCommand.register(dispatcher);
+			//?}
+		});
 	}
 	//?}
 }

@@ -107,6 +107,29 @@ Transposes all Note Blocks in the selected cuboid area.
 
 If a transpose would push a Note Block outside the vanilla range, Infinote attempts to keep the same mapped sound by choosing another configured supporting block with a compatible pitch shift.
 
+```
+/bpm set <bpm> <tickPerQuarter>
+```
+
+Sets the server tick rate from BPM.  
+This command calculates TPS with:
+
+```
+tps = bpm * tickPerQuarter / 60
+```
+
+Then it runs:
+
+```
+/tick rate <tps>
+```
+
+- `<bpm>`: Beats per minute
+- `<tickPerQuarter>`: Ticks per quarter note
+- Available on Minecraft versions with the vanilla `tick rate` command (mc1.20.3+)
+
+For example, `/bpm set 120 8` sets the tick rate to `16` TPS.
+
 ---
 
 ### 🎵 About `pitchShift`

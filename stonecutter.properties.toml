@@ -1,7 +1,7 @@
 # Mod metadata — shared across all versions
 mod.id      = "infinote"
 mod.name    = "infinote"
-mod.version = "1.4.1"
+mod.version = "1.5.0"
 mod.group   = "com.rs256"
 
 deps.fabric_loader = "0.18.6"
@@ -123,9 +123,9 @@ mod.mc_targets  = "1.20.1"
 
 ["1.20.2"]
 deps.fabric_api = "0.91.6+1.20.2"
-mod.mc_dep      = "1.20.2"
+mod.mc_dep      = ">=1.20 <=1.20.2"
 mod.mc_title    = "1.20.2"
-mod.mc_targets  = "1.20.2"
+mod.mc_targets  = "1.20 1.20.1 1.20.2"
 
 ["1.20.3"]
 deps.fabric_api = "0.91.1+1.20.3"
@@ -147,9 +147,9 @@ mod.mc_targets  = "1.20.5"
 
 ["1.20.6"]
 deps.fabric_api = "0.100.8+1.20.6"
-mod.mc_dep      = ">=1.20 <=1.20.6"
+mod.mc_dep      = ">=1.20.3 <=1.20.6"
 mod.mc_title    = "1.20.6"
-mod.mc_targets  = "1.20 1.20.1 1.20.2 1.20.3 1.20.4 1.20.5 1.20.6"
+mod.mc_targets  = "1.20.3 1.20.4 1.20.5 1.20.6"
 
 ["1.21"]
 deps.fabric_api = "0.102.0+1.21"
