@@ -33,13 +33,14 @@ public class BpmCommand {
 
     private static int executeSet(CommandSourceStack source, float bpm, int tickPerQuarter) {
         double tps = (double) bpm * tickPerQuarter / 60.0D;
-        if (tps == 0.0F) {
+        if (tps == 0.0D) {
             source.sendFailure(ComponentCompat.literal("Calculated tps must not be 0"));
             return 0;
         }
 
         String tpsString = format(tps);
-        source.getServer().getCommands().performPrefixedCommand(source, "tick rate " + tpsString);
+        source.getServer().tickRateManager().setTickRate((float) tps);
+        CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("Tick rate set to " + tpsString + " TPS"), true);
 
         MutableComponent result = ComponentCompat.buildWithBreak(
                 ComponentCompat.literal("BPM settings").withStyle(ChatFormatting.GOLD),
