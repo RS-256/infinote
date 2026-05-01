@@ -156,19 +156,24 @@ tasks {
 
 // ---------------------------------------------------------------
 // Publishes builds to Modrinth and Curseforge
-// with changelog from the CHANGELOG.md file
+// with changelog from the CHANGELOG.md file only on the final release version
 //
 // uncomment after enabling mod-publish-plugin above
 // and filling in publish.modrinth / publish.curseforge in
 // root/gradle.properties.
 // ---------------------------------------------------------------
 
+val changelogReleaseVersion = rootProject.extra["publish.changelogReleaseVersion"] as String
+val publishChangelog =
+    if (sc.current.version == changelogReleaseVersion) rootProject.file("CHANGELOG.md").readText()
+    else ""
+
 publishMods {
     file           = tasks.jar.flatMap { it.archiveFile }
     //additionalFiles.from(tasks.sourcesJar.flatMap { it.archiveFile })
     displayName    = "${property("mod.name")} v${property("mod.version")} for mc${property("mod.mc_title")}"
     version        = "v${property("mod.version")}-mc${sc.current.version}"
-    changelog      = rootProject.file("CHANGELOG.md").readText()
+    changelog      = publishChangelog
     type           = STABLE
     modLoaders.add("fabric")
 

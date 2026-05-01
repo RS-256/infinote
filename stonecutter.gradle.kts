@@ -47,6 +47,8 @@ val releaseVersions = listOf(
     "26.1.2"
 )
 
+extra["publish.changelogReleaseVersion"] = releaseVersions.last()
+
 tasks.register("buildReleaseRemapped") {
     group = "build"
     description = "Build remapped jars only for release representative versions."
