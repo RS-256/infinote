@@ -22,14 +22,30 @@ public class ImportConfig {
     private static final class NotebetterFabricRoot {
         List<NotebetterFabricMapping> mappings;
     }
+
+    private static final class NotebetterRoot {
+        List<NotebetterBlock> blocks;
+    }
+
     private static final class NotebetterFabricMapping {
         String block;
         NotebetterFabricSound sound;
     }
+
+    private static final class NotebetterBlock {
+        String block;
+        NotebetterSound sound;
+    }
+
     private static final class NotebetterFabricSound {
         String sound;
         double volume;
         double pitch;
+    }
+
+    private static final class NotebetterSound {
+        String name;
+        double volume;
     }
 
     public static int fromNotebetterfabric(String sourceFileName) {
@@ -80,6 +96,63 @@ public class ImportConfig {
 
         } catch (Exception e) {
             Infinote.LOGGER.error("Failed to read import file: {}", source, e);
+            return 0;
+        }
+
+        return replaceConfig(sourceFileName, imported, importedCount);
+    }
+
+    public static int fromNotebetter(String sourceFileName) {
+        Path source = CONFIG_DIR.resolve(sourceFileName);
+
+        if (!Files.exists(source)) {
+            Infinote.LOGGER.warn("Import file not found: {}", source);
+            return 0;
+        }
+
+        Map<String, BlockSoundConfig> imported = new LinkedHashMap<>();
+        int importedCount = 0;
+
+        try (Reader r = Files.newBufferedReader(source)) {
+            Gson gson = new Gson();
+            NotebetterRoot root = gson.fromJson(r, NotebetterRoot.class);
+            if (root == null || root.blocks == null) {
+                Infinote.LOGGER.warn("Import file has no blocks: {}", source);
+                return 0;
+            }
+
+            for (NotebetterBlock block : root.blocks) {
+                if (block == null || block.block == null || block.sound == null || block.sound.name == null) {
+                    continue;
+                }
+
+                String blockId = IdCompat.normalize(block.block);
+                String soundId = IdCompat.normalize(block.sound.name);
+                if (blockId == null || soundId == null) {
+                    continue;
+                }
+
+                BlockSoundConfig config = new BlockSoundConfig();
+                config.sound = soundId;
+                config.category = RECORDS;
+                config.pitchShift = 0.0f;
+                config.volume = (float) block.sound.volume;
+
+                imported.put(blockId, config);
+                importedCount++;
+            }
+
+        } catch (Exception e) {
+            Infinote.LOGGER.error("Failed to read import file: {}", source, e);
+            return 0;
+        }
+
+        return replaceConfig(sourceFileName, imported, importedCount);
+    }
+
+    private static int replaceConfig(String sourceFileName, Map<String, BlockSoundConfig> imported, int importedCount) {
+        if (importedCount == 0) {
+            Infinote.LOGGER.warn("Import file has zero valid entries: {}", sourceFileName);
             return 0;
         }
 

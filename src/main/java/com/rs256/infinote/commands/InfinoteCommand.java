@@ -77,10 +77,18 @@ public class InfinoteCommand {
                         )
                         .then(Commands.literal("import")
                                 .then(Commands.literal("notebetterfabric")
-                                        .then(Commands.argument("json", StringArgumentType.word())
+                                        .then(Commands.argument("path", StringArgumentType.word())
                                                 .executes(commandContext -> {
-                                                    String fileName = StringArgumentType.getString(commandContext, "json");
-                                                    return executeImport(commandContext.getSource(), fileName);
+                                                    String fileName = StringArgumentType.getString(commandContext, "path");
+                                                    return executeImportNotebetterFabric(commandContext.getSource(), fileName);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("notebetter")
+                                        .then(Commands.argument("path", StringArgumentType.word())
+                                                .executes(commandContext -> {
+                                                    String fileName = StringArgumentType.getString(commandContext, "path");
+                                                    return executeImportNotebetter(commandContext.getSource(), fileName);
                                                 })
                                         )
                                 )
@@ -174,10 +182,18 @@ public class InfinoteCommand {
                         )
                         .then(Commands.literal("import")
                                 .then(Commands.literal("notebetterfabric")
-                                        .then(Commands.argument("json", StringArgumentType.word())
+                                        .then(Commands.argument("path", StringArgumentType.word())
                                                 .executes(commandContext -> {
-                                                    String fileName = StringArgumentType.getString(commandContext, "json");
-                                                    return executeImport(commandContext.getSource(), fileName);
+                                                    String fileName = StringArgumentType.getString(commandContext, "path");
+                                                    return executeImportNotebetterFabric(commandContext.getSource(), fileName);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("notebetter")
+                                        .then(Commands.argument("path", StringArgumentType.word())
+                                                .executes(commandContext -> {
+                                                    String fileName = StringArgumentType.getString(commandContext, "path");
+                                                    return executeImportNotebetter(commandContext.getSource(), fileName);
                                                 })
                                         )
                                 )
@@ -260,10 +276,20 @@ public class InfinoteCommand {
         return 1;
     }
 
-    private static int executeImport(CommandSourceStack source, String fileName) {
+    private static int executeImportNotebetterFabric(CommandSourceStack source, String fileName) {
         int count = ImportConfig.fromNotebetterfabric(fileName);
         if (count == 0) {
             source.sendFailure(ComponentCompat.literal("The file: " + fileName + " does not exist, or is not in the correct notebetterfabric.json format, or has zero entries."));
+            return 0;
+        }
+        CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("Imported " + count + " mappings from " + fileName), true);
+        return 1;
+    }
+
+    private static int executeImportNotebetter(CommandSourceStack source, String fileName) {
+        int count = ImportConfig.fromNotebetter(fileName);
+        if (count == 0) {
+            source.sendFailure(ComponentCompat.literal("The file: " + fileName + " does not exist, or is not in the correct notebetter.json format, or has zero entries."));
             return 0;
         }
         CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("Imported " + count + " mappings from " + fileName), true);

@@ -104,6 +104,17 @@ This command allows easy migration from NotebetterFabric to Infinote.
 ---
 
 ```
+/infinote import notebetter <path>
+```
+
+Imports configuration from a **Notebetter-style JSON file** and converts `blocks` entries into Infinote mappings.
+
+- `<path>`: Path to the Notebetter configuration file
+- `materials` and `default` are ignored
+
+---
+
+```
 /infinote list [<page>] [<pageSize>]
 ```
 
@@ -297,7 +308,7 @@ In the above example, you should send command:
 
 ## 🔄 Migration from NotebetterFabric
 
-Infinote provides a built-in migration command for users coming from **NotebetterFabric**.
+Infinote provides built-in migration commands for users coming from **NotebetterFabric** or **Notebetter**.
 
 You can import an existing NotebetterFabric configuration file directly:
 
@@ -306,6 +317,16 @@ You can import an existing NotebetterFabric configuration file directly:
 ```
 
 - `<json>`: Path to your existing NotebetterFabric configuration file
+
+You can also import a Notebetter configuration file:
+
+```
+/infinote import notebetter <path>
+```
+
+- `<path>`: Path to your existing Notebetter configuration file
+- `blocks[].block` and `blocks[].sound.name/volume` are imported
+- `materials` and `default` are ignored
 
 The command reads the JSON file and converts it into Infinote format automatically.
 
