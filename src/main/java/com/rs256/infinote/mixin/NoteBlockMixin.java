@@ -13,6 +13,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
+//? if >=1.19 {
+import net.minecraft.world.level.gameevent.GameEvent;
+//?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -68,6 +71,9 @@ public abstract class NoteBlockMixin {
 
             playNote(level, blockPos, soundEvent, config, note);
 
+            // for sculk and allay
+            level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, blockPos);
+
             ci.cancel();
         }
     }
@@ -91,6 +97,9 @@ public abstract class NoteBlockMixin {
             SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundId);
 
             playNote(level, blockPos, soundEvent, config, note);
+
+            // for sculk and allay
+            level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, blockPos);
 
             ci.cancel();
         }
