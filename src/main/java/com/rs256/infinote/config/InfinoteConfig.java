@@ -20,8 +20,12 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static net.minecraft.sounds.SoundSource.RECORDS;
 
@@ -32,6 +36,10 @@ public class InfinoteConfig {
 
     public static Map<String, BlockSoundConfig> BLOCK_SOUNDS = new HashMap<>();
     public static final Map<String, BlockSoundConfigCompiled> BLOCK_SOUNDS_COMPILED = new HashMap<>();
+
+    public static List<String> BYPASS_BLOCKS = new ArrayList<>();
+    public static final Set<String> BYPASS_BLOCKS_COMPILED = new HashSet<>();
+
     public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir();
     public static final Path CONFIG_PATH = CONFIG_DIR.resolve("infinote.json");
 
@@ -49,8 +57,9 @@ public class InfinoteConfig {
         try {
             readConfigFile();
             LoadReport report = rebuildCache();
-            Infinote.LOGGER.info("Config: {} entries, compiled {}, badBlock {}, badSound {}, badCat {}",
-                    report.rawTotal(), report.compiledOk(), report.invalidBlockId(), report.invalidSoundId(), report.invalidCategory());
+            Infinote.LOGGER.info("Config: {} entries, compiled {}, badBlock {}, badSound {}, badCat {}, bypass {}/{}",
+                    report.rawTotal(), report.compiledOk(), report.invalidBlockId(), report.invalidSoundId(), report.invalidCategory(),
+                    report.bypassOk(), report.bypassTotal());
         } catch (Exception e) {
             Infinote.LOGGER.warn("Config corrupted or unreadable: {}. Backing up and regenerating...", e.getMessage());
             recoverFromCorruptConfig();
@@ -88,8 +97,41 @@ public class InfinoteConfig {
         return BLOCK_SOUNDS.containsKey(blockId);
     }
 
+    public static boolean addBypass(String blockId) {
+        String key = IdCompat.normalize(blockId);
+        if (key == null || BYPASS_BLOCKS_COMPILED.contains(key)) {
+            return false;
+        }
+
+        BYPASS_BLOCKS.add(key);
+        save();
+        rebuildCache();
+        return true;
+    }
+
+    public static boolean removeBypass(String blockId) {
+        String key = IdCompat.normalize(blockId);
+        if (key == null) {
+            return false;
+        }
+
+        // remove entry even not normalized
+        if (!BYPASS_BLOCKS.removeIf(raw -> key.equals(IdCompat.normalize(raw)))) {
+            return false;
+        }
+
+        save();
+        rebuildCache();
+        return true;
+    }
+
+    public static boolean isInBypass(String blockId) {
+        String key = IdCompat.normalize(blockId);
+        return key != null && BYPASS_BLOCKS_COMPILED.contains(key);
+    }
+
     /**
-     * BLOCK_SOUNDS からコンパイル済みキャッシュを再構築
+     * rebuild cache: BLOCK_SOUNDS / BYPASS_BLOCKS
      */
     public static LoadReport rebuildCache() {
         BLOCK_SOUNDS_COMPILED.clear();
@@ -132,7 +174,23 @@ public class InfinoteConfig {
             compiledOk++;
         }
 
-        return new LoadReport(BLOCK_SOUNDS.size(), compiledOk, invalidBlockId, invalidSoundId, invalidCategory);
+        BYPASS_BLOCKS_COMPILED.clear();
+
+        int bypassOk = 0;
+
+        for (String rawBypassKey : BYPASS_BLOCKS) {
+            String bypassKey = IdCompat.normalize(rawBypassKey);
+            if (bypassKey == null) {
+                Infinote.LOGGER.warn("Skipping invalid bypass block id: {}", rawBypassKey);
+                continue;
+            }
+
+            if (BYPASS_BLOCKS_COMPILED.add(bypassKey)) {
+                bypassOk++;
+            }
+        }
+
+        return new LoadReport(BLOCK_SOUNDS.size(), compiledOk, invalidBlockId, invalidSoundId, invalidCategory, BYPASS_BLOCKS.size(), bypassOk);
     }
 
     private static void readConfigFile() throws IOException {
@@ -205,6 +263,23 @@ public class InfinoteConfig {
             throw new JsonParseException("schema 1: 'mappings' could not be parsed.");
         }
         BLOCK_SOUNDS = parsed;
+
+        // bypass は schema 1 に後から生えたので、無い/null = 空
+        BYPASS_BLOCKS = new ArrayList<>();
+
+        if (rootObject.has("bypass") && !rootObject.get("bypass").isJsonNull()) {
+            JsonElement bypassElement = rootObject.get("bypass");
+            if (!bypassElement.isJsonArray()) {
+                throw new JsonParseException("schema 1: 'bypass' must be an array.");
+            }
+            Type bypassType = new TypeToken<List<String>>() {
+            }.getType();
+            List<String> parsedBypass = GSON.fromJson(bypassElement, bypassType);
+            if (parsedBypass == null) {
+                throw new JsonParseException("schema 1: 'bypass' could not be parsed.");
+            }
+            BYPASS_BLOCKS = parsedBypass;
+        }
     }
 
     private static void generateDefaultConfig() {
@@ -238,16 +313,21 @@ public class InfinoteConfig {
         BLOCK_SOUNDS = new HashMap<>();
         BLOCK_SOUNDS.put("minecraft:air", defaultConfig);
 
+        BYPASS_BLOCKS = new ArrayList<>();
+
         try (Writer writer = Files.newBufferedWriter(CONFIG_PATH)) {
             GSON.toJson(buildJsonObject(), writer);
         }
     }
 
-    /** { "schema": N, "mappings": { ... } } のJsonObjectをビルド */
+    /**
+     *  { "schema": N, "mappings": { ... }, "bypass": [ ... ] } -> jsonObject
+     */
     private static JsonObject buildJsonObject() {
         JsonObject root = new JsonObject();
         root.addProperty("schema", CURRENT_SCHEMA);
         root.add("mappings", GSON.toJsonTree(BLOCK_SOUNDS));
+        root.add("bypass", GSON.toJsonTree(BYPASS_BLOCKS));
         return root;
     }
 

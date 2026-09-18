@@ -37,6 +37,7 @@ By using a **server-side resource pack**, all clients can hear the same custom s
 
 - Fully configurable noteblock sounds
 - Block-under-based sound expansion
+- Bypass list to keep noteblocks audible with a block on top
 - Config-driven
 - Primarily server-side logic
 - Multiplayer support
@@ -75,6 +76,32 @@ Adds or updates a sound mapping for the specified block.
 ```
 
 Removes the sound mapping for the specified block.
+
+
+```
+/infinote bypass add <block>
+/infinote bypass remove <block>
+/infinote bypass list [<page>] [<pageSize>]
+```
+
+Manages the **bypass list**.
+
+Vanilla Note Blocks stay silent when any block sits on top of them. Any block registered in the bypass list lifts
+that restriction: the Note Block plays even while that block is above it.
+
+- `<block>`: Target block ID placed **above** the Note Block (e.g. minecraft:stone)
+- `[<page>]` (optional): Page number to display, default is 1.
+- `[<pageSize>]` (optional): Number of entries per page, default is 16.
+
+The bypass list is stored in `config/infinote.json` under the `bypass` key, next to `mappings`.
+
+Two vanilla behaviours are deliberately preserved:
+
+- **Mob heads win.** On 1.19.3+, a mob head above a Note Block makes it play that mob's sound. That check runs
+  *before* the bypass check, so a mob head keeps its own sound even if it is in the bypass list.
+- **Sculk Sensors and Allays do not react to bypassed notes.** A note that only plays because of the bypass list
+  does not emit the `note_block_play` game event, so it stays silent to vibration listeners. Notes that vanilla
+  would have played anyway still emit it as usual.
 
 
 ```

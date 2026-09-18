@@ -72,6 +72,43 @@ public class InfinoteCommand {
                                         })
                                 )
                         )
+                        .then(Commands.literal("bypass")
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("block", BlockStateArgument.block())
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeBypassAdd(commandContext.getSource(), blockId);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("remove")
+                                        .then(Commands.argument("block", BlockStateArgument.block())
+                                                .suggests((commandContext, builder) -> {
+                                                    for (String key : InfinoteConfig.BYPASS_BLOCKS_COMPILED) {
+                                                        builder.suggest(key);
+                                                    }
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeBypassRemove(commandContext.getSource(), blockId);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("list")
+                                        .executes(commandContext -> executeBypassList(commandContext.getSource(), 1, 16))
+                                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                                .executes(commandContext -> executeBypassList(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "page"), 16))
+                                                .then(Commands.argument("pageSize", IntegerArgumentType.integer(1, 20))
+                                                        .executes(commandContext -> executeBypassList(
+                                                                commandContext.getSource(),
+                                                                IntegerArgumentType.getInteger(commandContext, "page"),
+                                                                IntegerArgumentType.getInteger(commandContext, "pageSize")
+                                                        ))
+                                                )
+                                        )
+                                )
+                        )
                         .then(Commands.literal("reload")
                                 .executes(commandContext -> executeReload(commandContext.getSource()))
                         )
@@ -177,6 +214,43 @@ public class InfinoteCommand {
                                         })
                                 )
                         )
+                        .then(Commands.literal("bypass")
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeBypassAdd(commandContext.getSource(), blockId);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("remove")
+                                        .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
+                                                .suggests((commandContext, builder) -> {
+                                                    for (String key : InfinoteConfig.BYPASS_BLOCKS_COMPILED) {
+                                                        builder.suggest(key);
+                                                    }
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeBypassRemove(commandContext.getSource(), blockId);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("list")
+                                        .executes(commandContext -> executeBypassList(commandContext.getSource(), 1, 16))
+                                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                                .executes(commandContext -> executeBypassList(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "page"), 16))
+                                                .then(Commands.argument("pageSize", IntegerArgumentType.integer(1, 20))
+                                                        .executes(commandContext -> executeBypassList(
+                                                                commandContext.getSource(),
+                                                                IntegerArgumentType.getInteger(commandContext, "page"),
+                                                                IntegerArgumentType.getInteger(commandContext, "pageSize")
+                                                        ))
+                                                )
+                                        )
+                                )
+                        )
                         .then(Commands.literal("reload")
                                 .executes(commandContext -> executeReload(commandContext.getSource()))
                         )
@@ -270,6 +344,26 @@ public class InfinoteCommand {
         return 1;
     }
 
+    private static int executeBypassAdd(CommandSourceStack source, String blockId) {
+        if (!InfinoteConfig.addBypass(blockId)) {
+            source.sendFailure(ComponentCompat.literal("Already bypassing " + blockId));
+            return 0;
+        }
+
+        CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("Added bypass for " + blockId), true);
+        return 1;
+    }
+
+    private static int executeBypassRemove(CommandSourceStack source, String blockId) {
+        if (!InfinoteConfig.removeBypass(blockId)) {
+            source.sendFailure(ComponentCompat.literal("No such bypass about " + blockId));
+            return 0;
+        }
+
+        CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("Removed bypass for " + blockId), true);
+        return 1;
+    }
+
     private static int executeReload(CommandSourceStack source) {
         InfinoteConfig.load();
         CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("Infinote reloaded!"), true);
@@ -344,6 +438,63 @@ public class InfinoteCommand {
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
                         .withClickEvent(ComponentCompat.withClickRunCommand("/infinote list " + (p + 1) + " " + pageSize))
+                        .withHoverEvent(ComponentCompat.withHoverShowText(ComponentCompat.literal("Go to page " + (p + 1)))));
+
+        MutableComponent footer = ComponentCompat.empty();
+        footer.append(p > 1 ? prev : ComponentCompat.literal("<<<  ").withStyle(ChatFormatting.DARK_GRAY));
+        footer.append(center);
+        footer.append(p < totalPages ? next : ComponentCompat.literal("  >>>").withStyle(ChatFormatting.DARK_GRAY));
+
+        Component list = records.append("\n").append(footer);
+
+        CommandCompat.sourceSendSuccess(source, list, false);
+        return 1;
+    }
+
+    private static int executeBypassList(CommandSourceStack source, int page, int pageSize) {
+        List<String> keys = new ArrayList<>(InfinoteConfig.BYPASS_BLOCKS_COMPILED);
+        Collections.sort(keys);
+
+        int total = keys.size();
+        if (total == 0) {
+            CommandCompat.sourceSendSuccess(source, ComponentCompat.literal("You have no bypass blocks."), false);
+            return 1;
+        }
+
+        int totalPages = Math.max(1, (total + pageSize - 1) / pageSize);
+        int p = Math.max(1, Math.min(page, totalPages));
+        int from = (p - 1) * pageSize;
+        int to = Math.min(total, from + pageSize);
+
+        MutableComponent records = ComponentCompat.empty();
+        for (int i = from; i < to; i++) {
+            String blockId = keys.get(i);
+
+            records.append(
+                    ComponentCompat.literal("\n")
+                            .append(ComponentCompat.literal("[X] ")
+                                    .withStyle(style -> style
+                                            .withColor(ChatFormatting.RED)
+                                            .withClickEvent(ComponentCompat.withClickSuggestCommand("/infinote bypass remove " + blockId))))
+                            .append(blockId)
+                            .withStyle(ChatFormatting.AQUA)
+            );
+        }
+
+        Component prev = ComponentCompat.literal("<<<  ")
+                .withStyle(style -> style
+                        .withColor(ChatFormatting.GRAY)
+                        .withClickEvent(ComponentCompat.withClickRunCommand("/infinote bypass list " + (p - 1) + " " + pageSize))
+                        .withHoverEvent(ComponentCompat.withHoverShowText(ComponentCompat.literal("Go to page " + (p - 1)))));
+
+        Component center = ComponentCompat.literal(
+                " " + total + " bypass blocks  |  page " + p + "/" + totalPages + "  (" + pageSize + "/page)"
+        ).withStyle(ChatFormatting.GOLD);
+
+        Component next = ComponentCompat.literal("  >>>")
+                .withStyle(style -> style
+                        .withColor(ChatFormatting.GRAY)
+                        .withClickEvent(ComponentCompat.withClickRunCommand("/infinote bypass list " + (p + 1) + " " + pageSize))
                         .withHoverEvent(ComponentCompat.withHoverShowText(ComponentCompat.literal("Go to page " + (p + 1)))));
 
         MutableComponent footer = ComponentCompat.empty();

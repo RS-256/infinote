@@ -1,7 +1,8 @@
 package com.rs256.infinote.mixin;
 
-import com.rs256.infinote.compat.IdCompat;
+import com.rs256.infinote.compat.NoteBlockCompat;
 import com.rs256.infinote.compat.RegistryCompat;
+import com.rs256.infinote.compat.SoundCompat;
 import com.rs256.infinote.config.BlockSoundConfigCompiled;
 import com.rs256.infinote.config.InfinoteConfig;
 
@@ -11,11 +12,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.NoteBlock;
 import net.minecraft.world.level.block.state.BlockState;
-//? if >=1.19 {
-import net.minecraft.world.level.gameevent.GameEvent;
-//?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,97 +27,70 @@ import static com.rs256.infinote.Infinote.LOGGER;
 public abstract class NoteBlockMixin {
     @Inject(method = "playNote", at = @At("HEAD"), cancellable = true)
     //? if <=1.18.2 {
-    /*private void infinote_onPlayNote(Level level, BlockPos blockPos, CallbackInfo ci) {
-        if (!level.getBlockState(blockPos.above(1)).isAir()) {
-            return;
-        }
-
-        int note = level.getBlockState(blockPos).getValue(NoteBlock.NOTE);
-
-        BlockPos belowPos = blockPos.below(1);
-
-        String belowBlock = RegistryCompat.getKey(level.getBlockState(belowPos).getBlock());
-        BlockSoundConfigCompiled config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(belowBlock);
-
-        if (config != null) {
-            if (IdCompat.idFromString(config.sound) == null) {
-                LOGGER.warn("cant cast!: {}, ignored", config.sound);
-                return;
-            }
-
-            SoundEvent soundEvent = new SoundEvent(IdCompat.idFromString(config.sound));
-
-            playNote(level, blockPos, soundEvent, config, note);
-
-            ci.cancel();
-        }
+    /*private void infinote$onPlayNote(Level level, BlockPos blockPos, CallbackInfo ci) {
+        infinote$handlePlayNote(null, level.getBlockState(blockPos), level, blockPos, ci);
     }
     *///?} else if <=1.19.2 {
-    /*private void infinote_onPlayNote(Entity entity, Level level, BlockPos blockPos, CallbackInfo ci) {
-        if (!level.getBlockState(blockPos.above(1)).isAir()) {
-            return;
-        }
-
-        int note = level.getBlockState(blockPos).getValue(NoteBlock.NOTE);
-
-        BlockPos belowPos = blockPos.below(1);
-
-        String belowBlock = RegistryCompat.getKey(level.getBlockState(belowPos).getBlock());
-        BlockSoundConfigCompiled config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(belowBlock);
-
-        if (config != null) {
-            var soundId = IdCompat.idFromString(config.sound);
-
-            if (soundId == null) {
-                LOGGER.warn("cant cast!: {}, ignored", config.sound);
-                return;
-            }
-
-            SoundEvent soundEvent = new SoundEvent(soundId);
-
-            playNote(level, blockPos, soundEvent, config, note);
-
-            // for sculk and allay
-            level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, blockPos);
-
-            ci.cancel();
-        }
+    /*private void infinote$onPlayNote(Entity entity, Level level, BlockPos blockPos, CallbackInfo ci) {
+        infinote$handlePlayNote(entity, level.getBlockState(blockPos), level, blockPos, ci);
     }
     *///?} else {
     private void infinote$onPlayNote(Entity entity, BlockState state, Level level, BlockPos blockPos, CallbackInfo ci) {
-        if (!level.getBlockState(blockPos.above(1)).isAir()) {
+        infinote$handlePlayNote(entity, state, level, blockPos, ci);
+    }
+    //?}
+
+    @Unique
+    private void infinote$handlePlayNote(Entity entity, BlockState state, Level level, BlockPos blockPos, CallbackInfo ci) {
+        // for mob head
+        if (NoteBlockCompat.worksAboveNoteBlock(state)) {
             return;
         }
 
-        int note = state.getValue(NoteBlock.NOTE);
+        BlockState aboveState = level.getBlockState(blockPos.above(1));
+        boolean airAbove = aboveState.isAir();
+        // bypass; must after mob head
+        boolean bypassed = !airAbove && InfinoteConfig.BYPASS_BLOCKS_COMPILED.contains(RegistryCompat.getKey(aboveState.getBlock()));
+
+        if (!airAbove && !bypassed) {
+            // should vanilla sound
+            return;
+        }
 
         BlockPos belowPos = blockPos.below(1);
 
         String belowBlock = RegistryCompat.getKey(level.getBlockState(belowPos).getBlock());
         BlockSoundConfigCompiled config = InfinoteConfig.BLOCK_SOUNDS_COMPILED.get(belowBlock);
 
-        if (config != null) {
-            var soundId = IdCompat.idFromString(config.sound);
-
-            if (soundId == null) {
-                LOGGER.warn("cant cast!: {}, ignored", config.sound);
+        if (config == null) {
+            if (!bypassed) {
                 return;
             }
-
-            SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundId);
-
-            playNote(level, blockPos, soundEvent, config, note);
-
-            // for sculk and allay
-            level.gameEvent(entity, GameEvent.NOTE_BLOCK_PLAY, blockPos);
+            // vanilla event
+            level.blockEvent(blockPos, (Block) (Object) this, 0, 0);
 
             ci.cancel();
+            return;
         }
+
+        SoundEvent soundEvent = SoundCompat.soundEventFromString(config.sound);
+
+        if (soundEvent == null) {
+            LOGGER.warn("cant cast!: {}, ignored", config.sound);
+            return;
+        }
+
+        infinote$playNote(level, blockPos, soundEvent, config, state.getValue(NoteBlock.NOTE));
+
+        if (!bypassed) {
+            NoteBlockCompat.notePlayedGameEvent(level, entity, blockPos);
+        }
+
+        ci.cancel();
     }
-//?}
 
     @Unique
-    private static void playNote(Level level, BlockPos blockPos, SoundEvent soundEvent, BlockSoundConfigCompiled config, int note) {
+    private static void infinote$playNote(Level level, BlockPos blockPos, SoundEvent soundEvent, BlockSoundConfigCompiled config, int note) {
         float shiftedNote = note + config.pitchShift;
         float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
         ServerLevel serverLevel = (ServerLevel) level;
