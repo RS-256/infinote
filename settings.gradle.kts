@@ -56,10 +56,11 @@ stonecutter {
             "26.1",
             "26.1.1",
             "26.1.2",
-            "26.2"
+            "26.2",
+            "26.3"
         ).buildscript("build.unobfuscated.gradle.kts")
 
-        vcsVersion = "26.2"
+        vcsVersion = "26.3"
     }
 }
 
