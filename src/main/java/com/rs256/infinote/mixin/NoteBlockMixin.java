@@ -29,6 +29,9 @@ public abstract class NoteBlockMixin {
     @Inject(method = "playNote", at = @At("HEAD"), cancellable = true)
     //? if <=1.18.2 {
     /*private void infinote_onPlayNote(Level level, BlockPos blockPos, CallbackInfo ci) {
+        if (!level.getBlockState(blockPos.above(1)).isAir()) {
+            return;
+        }
 
         int note = level.getBlockState(blockPos).getValue(NoteBlock.NOTE);
 
@@ -52,6 +55,10 @@ public abstract class NoteBlockMixin {
     }
     *///?} else if <=1.19.2 {
     /*private void infinote_onPlayNote(Entity entity, Level level, BlockPos blockPos, CallbackInfo ci) {
+        if (!level.getBlockState(blockPos.above(1)).isAir()) {
+            return;
+        }
+
         int note = level.getBlockState(blockPos).getValue(NoteBlock.NOTE);
 
         BlockPos belowPos = blockPos.below(1);
@@ -79,6 +86,10 @@ public abstract class NoteBlockMixin {
     }
     *///?} else {
     private void infinote$onPlayNote(Entity entity, BlockState state, Level level, BlockPos blockPos, CallbackInfo ci) {
+        if (!level.getBlockState(blockPos.above(1)).isAir()) {
+            return;
+        }
+
         int note = state.getValue(NoteBlock.NOTE);
 
         BlockPos belowPos = blockPos.below(1);
@@ -108,10 +119,6 @@ public abstract class NoteBlockMixin {
 
     @Unique
     private static void playNote(Level level, BlockPos blockPos, SoundEvent soundEvent, BlockSoundConfigCompiled config, int note) {
-        if (!level.getBlockState(blockPos.above(1)).isAir()) {
-            return;
-        }
-
         float shiftedNote = note + config.pitchShift;
         float pitch = (float) Math.pow(2.0D, (shiftedNote - 12) / 12.0D);
         ServerLevel serverLevel = (ServerLevel) level;
