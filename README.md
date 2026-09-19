@@ -62,7 +62,7 @@ https://deepwiki.com/RS-256/infinote
 ### Commands
 
 ```
-/infinote add <block> <sound> <category> <pitchShift> <volume>
+/infinote instrument add <block> <sound> <category> <pitchShift> <volume>
 ```
 
 Adds or updates a sound mapping for the specified block.
@@ -76,7 +76,7 @@ Adds or updates a sound mapping for the specified block.
 ---
 
 ```
-/infinote remove <block>
+/infinote instrument remove <block>
 ```
 
 Removes the sound mapping for the specified block.
@@ -143,7 +143,7 @@ Imports configuration from a **Notebetter-style JSON file** and converts `blocks
 ---
 
 ```
-/infinote list [<page>] [<pageSize>]
+/infinote instrument list [<page>] [<pageSize>]
 ```
 
 Lists entries currently stored in the configuration.
@@ -156,7 +156,7 @@ If not specified, default values are used.
 ---
 
 ```
-/infinote get <block>
+/infinote instrument get <block>
 ```
 
 Searches the configuration for a specific block entry.
@@ -320,14 +320,14 @@ Example `sounds.json`:
 After defining the sound in `sounds.json`, use its full ID in the command:
 
 ```
-/infinote add minecraft:stone <namespace>:custom.sound block 0 3
+/infinote instrument add minecraft:stone <namespace>:custom.sound block 0 3
 ```
 
 In the above example, you should send command:
 
 ```
-/infinote add minecraft:stone <mamespace>:your_sound records 0 3
-/infinote add minecraft:white_concrete <mamespace>:sound_id_in_the_command records 0 3
+/infinote instrument add minecraft:stone <mamespace>:your_sound records 0 3
+/infinote instrument add minecraft:white_concrete <mamespace>:sound_id_in_the_command records 0 3
 ```
 
 </details>
@@ -399,8 +399,8 @@ Attribution is required.
 
 ```
 [✓] config schem-version
-[✓] /infinote list <page> <pageSize>
-[✓] /infinote get <block>
+[✓] /infinote instrument list <page> <pageSize>
+[✓] /infinote instrument get <block>
 [✓] load report
 [✓] timestamp backup
 [✓] /infinote transpose <from> <to> <pitchTransposer>

@@ -12,3 +12,11 @@
 
 ### Changed
 
+- **Breaking.** `add` / `remove` / `list` / `get` moved under a new `instrument` subcommand, no longer sit at the same level as `bypass`. Rename them in any macros, command blocks or scripts:
+  - `/infinote add ...` -> `/infinote instrument add ...`
+  - `/infinote remove ...` -> `/infinote instrument remove ...`
+  - `/infinote list ...` -> `/infinote instrument list ...`
+  - `/infinote get ...` -> `/infinote instrument get ...`
+
+  `reload`, `import`, `transpose` and `/bpm` are unchanged. The config format is unchanged.
+

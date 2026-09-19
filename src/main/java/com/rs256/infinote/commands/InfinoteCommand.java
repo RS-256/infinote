@@ -31,45 +31,68 @@ public class InfinoteCommand {
     /*public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("infinote")
-                        .then(Commands.literal("add")
-                                .then(Commands.argument("block", BlockStateArgument.block())
-                                        .then(IdCompat.commandArgument("sound")
-                                                .suggests(CommandCompat.soundSuggestionProviders())
-                                                .then(Commands.argument("category", StringArgumentType.word())
-                                                        .suggests((commandContext, builder) -> {
-                                                            for (SoundSource cat : SoundSource.values()) {
-                                                                builder.suggest(cat.name().toLowerCase());
-                                                            }
-                                                            return builder.buildFuture();
-                                                        })
-                                                        .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
-                                                                .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
-                                                                        .executes(commandContext -> {
-                                                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                                                            String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
-                                                                            String rawCategory = StringArgumentType.getString(commandContext, "category");
-                                                                            float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
-                                                                            float volume = FloatArgumentType.getFloat(commandContext, "volume");
-                                                                            return executeAdd(commandContext.getSource(), blockId, soundId, rawCategory, pitchShift, volume);
-                                                                        })
+                        .then(Commands.literal("instrument")
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("block", BlockStateArgument.block())
+                                                .then(IdCompat.commandArgument("sound")
+                                                        .suggests(CommandCompat.soundSuggestionProviders())
+                                                        .then(Commands.argument("category", StringArgumentType.word())
+                                                                .suggests((commandContext, builder) -> {
+                                                                    for (SoundSource cat : SoundSource.values()) {
+                                                                        builder.suggest(cat.name().toLowerCase());
+                                                                    }
+                                                                    return builder.buildFuture();
+                                                                })
+                                                                .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
+                                                                        .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
+                                                                                .executes(commandContext -> {
+                                                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                                                    String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
+                                                                                    String rawCategory = StringArgumentType.getString(commandContext, "category");
+                                                                                    float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
+                                                                                    float volume = FloatArgumentType.getFloat(commandContext, "volume");
+                                                                                    return executeAdd(commandContext.getSource(), blockId, soundId, rawCategory, pitchShift, volume);
+                                                                                })
+                                                                        )
                                                                 )
                                                         )
                                                 )
                                         )
                                 )
-                        )
-                        .then(Commands.literal("remove")
-                                .then(Commands.argument("block", BlockStateArgument.block())
-                                        .suggests((commandContext, builder) -> {
-                                            for (String key : InfinoteConfig.BLOCK_SOUNDS.keySet()) {
-                                                builder.suggest(key);
-                                            }
-                                            return builder.buildFuture();
-                                        })
-                                        .executes(commandContext -> {
-                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                            return executeRemove(commandContext.getSource(), blockId);
-                                        })
+                                .then(Commands.literal("remove")
+                                        .then(Commands.argument("block", BlockStateArgument.block())
+                                                .suggests((commandContext, builder) -> {
+                                                    for (String key : InfinoteConfig.BLOCK_SOUNDS.keySet()) {
+                                                        builder.suggest(key);
+                                                    }
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeRemove(commandContext.getSource(), blockId);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("list")
+                                        .executes(commandContext -> executeList(commandContext.getSource(), 1, 16))
+                                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                                .executes(commandContext -> executeList(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "page"), 16))
+                                                .then(Commands.argument("pageSize", IntegerArgumentType.integer(1, 20))
+                                                        .executes(commandContext -> executeList(
+                                                                commandContext.getSource(),
+                                                                IntegerArgumentType.getInteger(commandContext, "page"),
+                                                                IntegerArgumentType.getInteger(commandContext, "pageSize")
+                                                        ))
+                                                )
+                                        )
+                                )
+                                .then(Commands.literal("get")
+                                        .then(Commands.argument("block", BlockStateArgument.block())
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeGet(commandContext.getSource(), blockId);
+                                                })
+                                        )
                                 )
                         )
                         .then(Commands.literal("bypass")
@@ -128,27 +151,6 @@ public class InfinoteCommand {
                                                     return executeImportNotebetter(commandContext.getSource(), fileName);
                                                 })
                                         )
-                                )
-                        )
-                        .then(Commands.literal("list")
-                                .executes(commandContext -> executeList(commandContext.getSource(), 1, 16))
-                                .then(Commands.argument("page", IntegerArgumentType.integer(1))
-                                        .executes(commandContext -> executeList(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "page"), 16))
-                                        .then(Commands.argument("pageSize", IntegerArgumentType.integer(1, 20))
-                                                .executes(commandContext -> executeList(
-                                                        commandContext.getSource(),
-                                                        IntegerArgumentType.getInteger(commandContext, "page"),
-                                                        IntegerArgumentType.getInteger(commandContext, "pageSize")
-                                                ))
-                                        )
-                                )
-                        )
-                        .then(Commands.literal("get")
-                                .then(Commands.argument("block", BlockStateArgument.block())
-                                        .executes(commandContext -> {
-                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                            return executeGet(commandContext.getSource(), blockId);
-                                        })
                                 )
                         )
                         .then(Commands.literal("transpose")
@@ -173,45 +175,68 @@ public class InfinoteCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext) {
         dispatcher.register(
                 Commands.literal("infinote")
-                        .then(Commands.literal("add")
-                                .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
-                                        .then(IdCompat.commandArgument("sound")
-                                                .suggests(CommandCompat.soundSuggestionProviders())
-                                                .then(Commands.argument("category", StringArgumentType.word())
-                                                        .suggests((commandContext, builder) -> {
-                                                            for (SoundSource cat : SoundSource.values()) {
-                                                                builder.suggest(cat.name().toLowerCase());
-                                                            }
-                                                            return builder.buildFuture();
-                                                        })
-                                                        .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
-                                                                .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
-                                                                        .executes(commandContext -> {
-                                                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                                                            String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
-                                                                            String rawCategory = StringArgumentType.getString(commandContext, "category");
-                                                                            float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
-                                                                            float volume = FloatArgumentType.getFloat(commandContext, "volume");
-                                                                            return executeAdd(commandContext.getSource(), blockId, soundId, rawCategory, pitchShift, volume);
-                                                                        })
+                        .then(Commands.literal("instrument")
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
+                                                .then(IdCompat.commandArgument("sound")
+                                                        .suggests(CommandCompat.soundSuggestionProviders())
+                                                        .then(Commands.argument("category", StringArgumentType.word())
+                                                                .suggests((commandContext, builder) -> {
+                                                                    for (SoundSource cat : SoundSource.values()) {
+                                                                        builder.suggest(cat.name().toLowerCase());
+                                                                    }
+                                                                    return builder.buildFuture();
+                                                                })
+                                                                .then(Commands.argument("pitchShift", FloatArgumentType.floatArg(-48))
+                                                                        .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
+                                                                                .executes(commandContext -> {
+                                                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                                                    String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
+                                                                                    String rawCategory = StringArgumentType.getString(commandContext, "category");
+                                                                                    float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
+                                                                                    float volume = FloatArgumentType.getFloat(commandContext, "volume");
+                                                                                    return executeAdd(commandContext.getSource(), blockId, soundId, rawCategory, pitchShift, volume);
+                                                                                })
+                                                                        )
                                                                 )
                                                         )
                                                 )
                                         )
                                 )
-                        )
-                        .then(Commands.literal("remove")
-                                .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
-                                        .suggests((commandContext, builder) -> {
-                                            for (String key : InfinoteConfig.BLOCK_SOUNDS.keySet()) {
-                                                builder.suggest(key);
-                                            }
-                                            return builder.buildFuture();
-                                        })
-                                        .executes(commandContext -> {
-                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                            return executeRemove(commandContext.getSource(), blockId);
-                                        })
+                                .then(Commands.literal("remove")
+                                        .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
+                                                .suggests((commandContext, builder) -> {
+                                                    for (String key : InfinoteConfig.BLOCK_SOUNDS.keySet()) {
+                                                        builder.suggest(key);
+                                                    }
+                                                    return builder.buildFuture();
+                                                })
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeRemove(commandContext.getSource(), blockId);
+                                                })
+                                        )
+                                )
+                                .then(Commands.literal("list")
+                                        .executes(commandContext -> executeList(commandContext.getSource(), 1, 16))
+                                        .then(Commands.argument("page", IntegerArgumentType.integer(1))
+                                                .executes(commandContext -> executeList(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "page"), 16))
+                                                .then(Commands.argument("pageSize", IntegerArgumentType.integer(1, 20))
+                                                        .executes(commandContext -> executeList(
+                                                                commandContext.getSource(),
+                                                                IntegerArgumentType.getInteger(commandContext, "page"),
+                                                                IntegerArgumentType.getInteger(commandContext, "pageSize")
+                                                        ))
+                                                )
+                                        )
+                                )
+                                .then(Commands.literal("get")
+                                        .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
+                                                .executes(commandContext -> {
+                                                    String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
+                                                    return executeGet(commandContext.getSource(), blockId);
+                                                })
+                                        )
                                 )
                         )
                         .then(Commands.literal("bypass")
@@ -270,27 +295,6 @@ public class InfinoteCommand {
                                                     return executeImportNotebetter(commandContext.getSource(), fileName);
                                                 })
                                         )
-                                )
-                        )
-                        .then(Commands.literal("list")
-                                .executes(commandContext -> executeList(commandContext.getSource(), 1, 16))
-                                .then(Commands.argument("page", IntegerArgumentType.integer(1))
-                                        .executes(commandContext -> executeList(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "page"), 16))
-                                        .then(Commands.argument("pageSize", IntegerArgumentType.integer(1, 20))
-                                                .executes(commandContext -> executeList(
-                                                        commandContext.getSource(),
-                                                        IntegerArgumentType.getInteger(commandContext, "page"),
-                                                        IntegerArgumentType.getInteger(commandContext, "pageSize")
-                                                ))
-                                        )
-                                )
-                        )
-                        .then(Commands.literal("get")
-                                .then(Commands.argument("block", BlockStateArgument.block(commandBuildContext))
-                                        .executes(commandContext -> {
-                                            String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                            return executeGet(commandContext.getSource(), blockId);
-                                        })
                                 )
                         )
                         .then(Commands.literal("transpose")
@@ -416,7 +420,7 @@ public class InfinoteCommand {
                             .append(ComponentCompat.literal("[X] ")
                                     .withStyle(style -> style
                                             .withColor(ChatFormatting.RED)
-                                            .withClickEvent(ComponentCompat.withClickSuggestCommand("/infinote remove " + blockId))))
+                                            .withClickEvent(ComponentCompat.withClickSuggestCommand("/infinote instrument remove " + blockId))))
                             .append(blockId)
                             .withStyle(ChatFormatting.AQUA)
                             .append(ComponentCompat.literal(" -> ").withStyle(ChatFormatting.GRAY))
@@ -427,7 +431,7 @@ public class InfinoteCommand {
         Component prev = ComponentCompat.literal("<<<  ")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
-                        .withClickEvent(ComponentCompat.withClickRunCommand("/infinote list " + (p - 1) + " " + pageSize))
+                        .withClickEvent(ComponentCompat.withClickRunCommand("/infinote instrument list " + (p - 1) + " " + pageSize))
                         .withHoverEvent(ComponentCompat.withHoverShowText(ComponentCompat.literal("Go to page " + (p - 1)))));
 
         Component center = ComponentCompat.literal(
@@ -437,7 +441,7 @@ public class InfinoteCommand {
         Component next = ComponentCompat.literal("  >>>")
                 .withStyle(style -> style
                         .withColor(ChatFormatting.GRAY)
-                        .withClickEvent(ComponentCompat.withClickRunCommand("/infinote list " + (p + 1) + " " + pageSize))
+                        .withClickEvent(ComponentCompat.withClickRunCommand("/infinote instrument list " + (p + 1) + " " + pageSize))
                         .withHoverEvent(ComponentCompat.withHoverShowText(ComponentCompat.literal("Go to page " + (p + 1)))));
 
         MutableComponent footer = ComponentCompat.empty();
