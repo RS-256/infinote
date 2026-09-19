@@ -52,6 +52,9 @@ By using a **server-side resource pack**, all clients can hear the same custom s
 ---
 
 ## 🛠️ Usage
+If you are looking for a simple usage, an AI-powered wiki is a useful option. In most cases, just ask the AI a question and you will get an answer.
+
+https://deepwiki.com/RS-256/infinote
 
 <details>
 <summary><strong>Click to expand command usage</strong></summary>
@@ -59,7 +62,7 @@ By using a **server-side resource pack**, all clients can hear the same custom s
 ### Commands
 
 ```
-/infinote add <block> <sound> <category> <pitchShift> <volume>
+/infinote instrument add <block> <sound> <category> <pitchShift> <volume>
 ```
 
 Adds or updates a sound mapping for the specified block.
@@ -70,13 +73,15 @@ Adds or updates a sound mapping for the specified block.
 - `<pitchShift>`: Pitch shift in semitones (accepts **float**)
 - `<volume>`: Volume multiplier (float)
 
+---
 
 ```
-/infinote remove <block>
+/infinote instrument remove <block>
 ```
 
 Removes the sound mapping for the specified block.
 
+---
 
 ```
 /infinote bypass add <block>
@@ -103,6 +108,7 @@ Two vanilla behaviours are deliberately preserved:
   does not emit the `note_block_play` game event, so it stays silent to vibration listeners. Notes that vanilla
   would have played anyway still emit it as usual.
 
+---
 
 ```
 /infinote reload
@@ -110,6 +116,7 @@ Two vanilla behaviours are deliberately preserved:
 
 Reloads the configuration.
 
+---
 
 ```
 /infinote import notebetterfabric <json>
@@ -122,6 +129,8 @@ and converts it into Infinote format.
 
 This command allows easy migration from NotebetterFabric to Infinote.
 
+---
+
 ```
 /infinote import notebetter <path>
 ```
@@ -131,6 +140,33 @@ Imports configuration from a **Notebetter-style JSON file** and converts `blocks
 - `<path>`: Path to the Notebetter configuration file
 - `materials` and `default` are ignored
 
+---
+
+```
+/infinote instrument list [<page>] [<pageSize>]
+```
+
+Lists entries currently stored in the configuration.
+
+- `[<page>]` (optional): Page number to display, default is 1.
+- `[<pageSize>]` (optional): Number of entries per page, default is 16.
+
+If not specified, default values are used.
+
+---
+
+```
+/infinote instrument get <block>
+```
+
+Searches the configuration for a specific block entry.
+
+- `<block>`: Target block id (e.g. minecraft:stone)
+
+Displays the sound mapping assigned to the block if exists.
+
+---
+
 ```
 /infinote transpose <from> <to> <pitchTransposer>
 ```
@@ -139,9 +175,14 @@ Transposes all Note Blocks in the selected cuboid area.
 
 - `<from>`: First corner of the target area
 - `<to>`: Opposite corner of the target area
-- `<pitchTransposer>`: Amount of semitone shift to apply
+- `<pitchTransposer>`: Amount of semitone shift to apply to each Note Block
 
-If a transpose would push a Note Block outside the vanilla range, Infinote attempts to keep the same mapped sound by choosing another configured supporting block with a compatible pitch shift.
+When the target note stays inside vanilla Note Block range, the note value is shifted directly.
+If the target note goes out of range, Infinote attempts to preserve the same sound by switching the supporting block below the Note Block to another configured mapping with a compatible pitch shift.
+
+This makes it possible to transpose larger builds without manually rebuilding every mapping.
+
+---
 
 ```
 /bpm set <bpm> <tickPerQuarter>
@@ -162,8 +203,6 @@ Then it directly changes the server tick rate to the calculated TPS and sends a 
 - The calculated TPS must not be `0`
 
 For example, `/bpm set 120 8` sets the tick rate to `16` TPS.
-
----
 
 ### 🎵 About `pitchShift`
 
@@ -281,14 +320,14 @@ Example `sounds.json`:
 After defining the sound in `sounds.json`, use its full ID in the command:
 
 ```
-/infinote add minecraft:stone <namespace>:custom.sound block 0 3
+/infinote instrument add minecraft:stone <namespace>:custom.sound block 0 3
 ```
 
 In the above example, you should send command:
 
 ```
-/infinote add minecraft:stone <mamespace>:your_sound records 0 3
-/infinote add minecraft:white_concrete <mamespace>:sound_id_in_the_command records 0 3
+/infinote instrument add minecraft:stone <mamespace>:your_sound records 0 3
+/infinote instrument add minecraft:white_concrete <mamespace>:sound_id_in_the_command records 0 3
 ```
 
 </details>
