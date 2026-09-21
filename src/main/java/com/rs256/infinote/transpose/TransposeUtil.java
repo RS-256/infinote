@@ -69,12 +69,16 @@ public final class TransposeUtil {
 
                     String result = transposeBlock(level, mutable, k, cache);
 
-                    switch (result) {
-                        case "changed" -> changed++;
-                        case "not_note_block" -> notNoteBlock++;
-                        case "no_mapping" -> noMapping++;
-                        case "no_candidates" -> noCandidates++;
-                        case "invalid_candidate_block" -> invalid++;
+                    if ("changed".equals(result)) {
+                        changed++;
+                    } else if ("not_note_block".equals(result)) {
+                        notNoteBlock++;
+                    } else if ("no_mapping".equals(result)) {
+                        noMapping++;
+                    } else if ("no_candidates".equals(result)) {
+                        noCandidates++;
+                    } else if ("invalid_candidate_block".equals(result)) {
+                        invalid++;
                     }
                 }
             }
@@ -165,7 +169,7 @@ public final class TransposeUtil {
             return "no_candidates";
         }
 
-        var bestBlockIdObj = IdCompat.idFromString(bestBlockId);
+        Object bestBlockIdObj = IdCompat.idFromString(bestBlockId);
         if (bestBlockIdObj == null) {
             Infinote.LOGGER.warn("transpose candidate block invalid: {}", bestBlockId);
             return "invalid_candidate_block";
