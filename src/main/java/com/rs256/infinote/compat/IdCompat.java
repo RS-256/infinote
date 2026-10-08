@@ -33,7 +33,7 @@ public final class IdCompat {
         return Commands.argument(key, ResourceLocationArgument.id());
     }
 
-    public static String iDArgumentGetIdString(CommandContext<CommandSourceStack> commandContext, String name) {
+    public static String idArgumentGetIdString(CommandContext<CommandSourceStack> commandContext, String name) {
         return ResourceLocationArgument.getId(commandContext, name).toString();
     }
     *///?} else {
@@ -45,7 +45,7 @@ public final class IdCompat {
         return Commands.argument(key, IdentifierArgument.id());
     }
 
-    public static String iDArgumentGetIdString(CommandContext<CommandSourceStack> commandContext, String name) {
+    public static String idArgumentGetIdString(CommandContext<CommandSourceStack> commandContext, String name) {
         return IdentifierArgument.getId(commandContext, name).toString();
     }
     //?}

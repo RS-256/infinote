@@ -46,7 +46,7 @@ public class InfinoteCommand {
                                                                         .then(Commands.argument("volume", FloatArgumentType.floatArg(0))
                                                                                 .executes(commandContext -> {
                                                                                     String blockId = RegistryCompat.getKey(BlockStateArgument.getBlock(commandContext, "block").getState().getBlock());
-                                                                                    String soundId = IdCompat.normalize(IdCompat.iDArgumentGetIdString(commandContext, "sound"));
+                                                                                    String soundId = IdCompat.normalize(IdCompat.idArgumentGetIdString(commandContext, "sound"));
                                                                                     String rawCategory = StringArgumentType.getString(commandContext, "category");
                                                                                     float pitchShift = FloatArgumentType.getFloat(commandContext, "pitchShift");
                                                                                     float volume = FloatArgumentType.getFloat(commandContext, "volume");
