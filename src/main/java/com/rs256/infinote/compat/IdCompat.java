@@ -16,12 +16,12 @@ public final class IdCompat {
     private IdCompat() {
     }
 
-    // "path" -> "minecraft:path" にする等、最低限の正規化 <- Identifierにあるので、いつかけす
+    // "path" -> "minecraft:path" <- Identifierにあるのでいつかけす
     public static String normalize(String raw) {
-        if (raw == null) return null;
-        String s = raw.trim();
-        if (s.isEmpty()) return null;
-        return s;
+        if (raw == null) {
+            return null;
+        }
+        return idFromString(raw).toString();
     }
 
     //? if <=1.21.10 {
